@@ -25,3 +25,4 @@ dist-ssr
 
 /src/store/useActionStore.js
 /src/components/DeleteConfirmationModal.jsx
+.env

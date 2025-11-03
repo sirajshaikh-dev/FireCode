@@ -1,8 +1,10 @@
 import { X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { usePlaylistStore } from "../../store/usePlaylistStore";
 
 const CreatePlaylistModal = ({ ModalRef, closeModal, onSubmit }) => {
+  const {isPlaylistLoading} = usePlaylistStore();
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
   const [serverError, setServerError] = useState(null);
 
@@ -81,7 +83,7 @@ const CreatePlaylistModal = ({ ModalRef, closeModal, onSubmit }) => {
               Cancel
             </button>
             <button type="submit" className="btn btn-primary">
-              Create
+              {isPlaylistLoading ? "Creating..." : "Create Playlist"}
             </button>
           </div>
         </form>

@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react'
 import { X, Plus, Loader } from 'lucide-react'
 import { usePlaylistStore } from '../../store/usePlaylistStore'
 import CreatePlaylistModal from './CreatePlaylistModal'
-import toast from 'react-hot-toast'
 
 
 const AddToPlaylistModal = ({ ModalRef, closeModal, problemId }) => {
@@ -43,12 +42,12 @@ const AddToPlaylistModal = ({ ModalRef, closeModal, problemId }) => {
       return { success: false , message: error.message};
     }
   }
-  const handleFormSubmit = async () => {
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
     setServerError("");
 
     const result = await addProblemToPlaylist(selectedPlaylist, [problemId]);
     if (result.success) {
-      toast.success("Problem added to playlist ✅");
       closeModal();
     } else {
       setServerError(result.message || "Failed to add problem to playlist");

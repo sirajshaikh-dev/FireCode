@@ -1,5 +1,5 @@
 //ProblemTable.jsx
-import React, { useState, useMemo, useRef } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Bookmark, PencilIcon, TrashIcon, Plus, OptionIcon, MoveLeftIcon, MoveRightIcon, Loader, Loader2 } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
@@ -9,11 +9,10 @@ import CreatePlaylistModal from "./playlists/CreatePlaylistModal";
 import AddToPlaylistModal from "./playlists/AddToPlaylistModal";
 
 
-const ProblemTable = ({ problems }) => {
-  console.log("Problems: ", problems);
+const ProblemTable = () => {
 
   const { authUser } = useAuthStore()
-  const { deleteProblem, isDeletingProblem } = useProblemStore();
+  const { getAllProblems, problems, isProblemLoading, deleteProblem, isDeletingProblem } = useProblemStore();
   const { createPlaylist } = usePlaylistStore()
   // const createPlaylist = usePlaylistStore((state) => state.createPlaylist);
 
@@ -51,6 +50,10 @@ const ProblemTable = ({ problems }) => {
     }
   };
 
+  useEffect(() => {
+  getAllProblems();
+}, [getAllProblems]);
+
   // Extract all unique tags from problems
   const allTags = useMemo(() => {
     if (!Array.isArray(problems)) return []
@@ -79,6 +82,14 @@ const ProblemTable = ({ problems }) => {
 
   // console.log("paginatedProblems", paginatedProblems);
 
+    if (isProblemLoading) {
+    return (
+      <div className="flex items-center justify-center mt-20">
+        <Loader className="animate-spin size-10 text-primary" />
+      </div>
+    );
+  }
+
   const handleDelete = async (id) => {
     deleteProblem(id)
   }
@@ -98,6 +109,7 @@ const ProblemTable = ({ problems }) => {
     openAddToPlaylistModal();
     setSelectedProblemId(problemId);
   };
+
 
   return (
     <div className="w-full max-w-6xl mx-auto mt-10">
