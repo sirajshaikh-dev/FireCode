@@ -570,14 +570,28 @@ const CreateProblemForm = () => {
     try {
       // stringify the data
       setIsLoading(true);
-      const res = await axiosInstance.post("/problems/create-problem", value);
+      const token = localStorage.getItem('token');
+      const res = await axiosInstance.post("/problems/create-problem", value, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       console.log(res.data);
       toast.success(res.data.message || "Problem Created Successfully 🔥");
       navigation("/");
     } catch (error) {
-      console.log("Error creating problem", error);
+      console.log("Error creating problem:", error);
+      if (error.response) {
+        console.log("Response data:", error.response.data);
+        console.log("Response status:", error.response.status);
+      } else if (error.request) {
+        console.log("No response received:", error.request);
+      } else {
+        console.log("Axios error message:", error.message);
+      }
       toast.error("Error creating problem");
-    } finally {
+    }
+    finally {
       setIsLoading(false);
     }
   };

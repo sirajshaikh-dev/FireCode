@@ -12,6 +12,18 @@ import playlistRoutes from './routes/playlist.routes.js';
 
 dotenv.config();
 
+console.log("Judge0 URL:", process.env.JUDGE0_API_URL);
+console.log("Judge0 Key:", process.env.JUDGE0_API_KEY ? "Loaded ✅" : "Missing ❌");
+
+
+//  Check Judge0 connection
+// import axios from "axios";
+// const res = await axios.get(`${process.env.JUDGE0_API_URL}/language`, {
+//   headers: { "Authorization": `Bearer ${process.env.JUDGE0_API_KEY}` }
+// });
+// console.log("Languages:", res.data);
+
+
 const app = express();
 app.use(express.json())
 app.use(cookieParser())

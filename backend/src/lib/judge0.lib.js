@@ -1,7 +1,12 @@
 import axios from "axios";
+console.log("🔥 judge0.lib.js initialized");
 
 const JUDGE0_API_URL = process.env.JUDGE0_API_URL;
 const JUDGE0_API_KEY = process.env.JUDGE0_API_KEY;
+
+console.log("hi from judge0");
+
+console.log("JUDGE0_API_KEY",JUDGE0_API_KEY);
 
 // Create a reusable axios instance with headers
 const judge0 = axios.create({
