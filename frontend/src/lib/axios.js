@@ -1,6 +1,10 @@
 import axios from "axios";
 
+const baseURL = import.meta.env.VITE_BASE_URL;
+
+console.log("Base URL:", baseURL); 
+
 export const axiosInstance = axios.create({
-  baseURL: ["http://localhost:8080/api/v1", "https://leetlab-h95h.onrender.com/api/v1"],
+  baseURL: `${baseURL}/api/v1`,
   withCredentials: true,
 });
