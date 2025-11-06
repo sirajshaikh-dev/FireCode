@@ -12,7 +12,7 @@ import AddToPlaylistModal from "./playlists/AddToPlaylistModal";
 const ProblemTable = () => {
 
   const { authUser } = useAuthStore()
-  const { getAllProblems, problems, isProblemLoading, deleteProblem, isDeletingProblem } = useProblemStore();
+  const { getAllProblems, problems, isProblemsLoading, deleteProblem, isDeletingProblem } = useProblemStore();
   const { createPlaylist } = usePlaylistStore()
   // const createPlaylist = usePlaylistStore((state) => state.createPlaylist);
 
@@ -51,8 +51,8 @@ const ProblemTable = () => {
   };
 
   useEffect(() => {
-  getAllProblems();
-}, [getAllProblems]);
+    getAllProblems();
+  }, [getAllProblems]);
 
   // Extract all unique tags from problems
   const allTags = useMemo(() => {
@@ -81,14 +81,6 @@ const ProblemTable = () => {
   }, [filteredProblems, currentPage])
 
   // console.log("paginatedProblems", paginatedProblems);
-
-    if (isProblemLoading) {
-    return (
-      <div className="flex items-center justify-center mt-20">
-        <Loader className="animate-spin size-10 text-primary" />
-      </div>
-    );
-  }
 
   const handleDelete = async (id) => {
     deleteProblem(id)
@@ -181,105 +173,108 @@ const ProblemTable = () => {
           </thead>
 
           <tbody>
-            {
-              paginatedProblems.length > 0
-                ? (
-                  paginatedProblems.map((problem) => {
-                    const isSolved = problem.solvedBy.some(
-                      (user) => user.userId === authUser?.id
-                    );
-                    return (
-                      <tr key={problem.id}>
-                        <td>
-                          <input
-                            type="checkbox"
-                            checked={isSolved}
-                            readOnly
-                            className="checkbox checkbox-sm"
-                          />
-                        </td>
-                        <td>
-                          <Link to={`/problem/${problem.id}`} className="font-semibold hover:underline">
-                            {problem.title}
-                          </Link>
-                        </td>
-                        <td>
-                          <div className="flex flex-wrap gap-1">
-                            {(problem.tags || []).map((tag, i) => (
-                              <span
-                                key={i}
-                                className="badge badge-outline badge-warning text-xs font-bold">
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                        </td>
-                        <td>
+            {isProblemsLoading ? (
+              <tr>
+                <td colSpan={5} className="text-center py-6">
+                  <Loader className="size-10 animate-spin mx-auto" />
+                </td>
+              </tr>
+            ) : paginatedProblems.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="text-center py-6 text-gray-500">
+                  No problems found.
+                </td>
+              </tr>
+            ) : (
+              // 🔹 Render problems when available
+              paginatedProblems.map((problem) => {
+                const isSolved = problem.solvedBy.some(
+                  (user) => user.userId === authUser?.id
+                );
+                return (
+                  <tr key={problem.id}>
+                    <td>
+                      <input
+                        type="checkbox"
+                        checked={isSolved}
+                        readOnly
+                        className="checkbox checkbox-sm"
+                      />
+                    </td>
+                    <td>
+                      <Link
+                        to={`/problem/${problem.id}`}
+                        className="font-semibold hover:underline"
+                      >
+                        {problem.title}
+                      </Link>
+                    </td>
+                    <td>
+                      <div className="flex flex-wrap gap-1">
+                        {(problem.tags || []).map((tag, i) => (
                           <span
-                            className={`badge font-semibold text-xs text-white ${problem.difficulty === "EASY"
-                              ? "badge-success"
-                              : problem.difficulty === "MEDIUM"
-                                ? "badge-warning"
-                                : "badge-error"
-                              }`}
+                            key={i}
+                            className="badge badge-outline badge-warning text-xs font-bold"
                           >
-                            {problem.difficulty}
+                            {tag}
                           </span>
-                        </td>
-                        <td>
-                          <div className="flex flex-col md:flex-row gap-2 lg:items-center md:items-center ">
-                            {authUser?.role === "ADMIN" && (
-                              <div className="flex gap-2">
-                                <div className="tooltip" data-tip="Delete">
-                                  <button
-                                    onClick={() => handleDelete(problem.id)}
-                                    disabled={isDeletingProblem}
-                                    className="btn btn-sm btn-error"
-                                  >
-                                    {
-                                      isDeletingProblem
-                                        ? <Loader2 className="animate-spin h-4 w-4" />
-                                        : <TrashIcon className="w-4 h-4 text-white" />
-
-                                    }
-                                  </button>
-                                </div>
-                                <div className="tooltip" data-tip="Edit">
-                                  <button className="tooltip-top btn btn-sm btn-warning" data-tip="Edit">
-                                    <PencilIcon className="w-4 h-4 text-white" />
-                                  </button>
-                                </div>
-
-                              </div>
-                            )}
-                            <div className="tooltip tooltip-top" data-tip="Add To Playlist">
-
+                        ))}
+                      </div>
+                    </td>
+                    <td>
+                      <span
+                        className={`badge font-semibold text-xs text-white ${problem.difficulty === "EASY"
+                            ? "badge-success"
+                            : problem.difficulty === "MEDIUM"
+                              ? "badge-warning"
+                              : "badge-error"
+                          }`}
+                      >
+                        {problem.difficulty}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="flex flex-col md:flex-row gap-2 lg:items-center md:items-center">
+                        {authUser?.role === "ADMIN" && (
+                          <div className="flex gap-2">
+                            <div className="tooltip" data-tip="Delete">
                               <button
-                                className="btn btn-circle btn-info btn-outline"
-                                onClick={() => handleAddToPlaylist(problem.id)}
+                                onClick={() => handleDelete(problem.id)}
+                                disabled={isDeletingProblem}
+                                className="btn btn-sm btn-error"
                               >
-                                <Bookmark className="w-4 h-4" />
-                                <span className="hidden"></span>
+                                {isDeletingProblem ? (
+                                  <Loader2 className="animate-spin h-4 w-4" />
+                                ) : (
+                                  <TrashIcon className="w-4 h-4 text-white" />
+                                )}
+                              </button>
+                            </div>
+                            <div className="tooltip" data-tip="Edit">
+                              <button className="tooltip-top btn btn-sm btn-warning" data-tip="Edit">
+                                <PencilIcon className="w-4 h-4 text-white" />
                               </button>
                             </div>
                           </div>
-                        </td>
-                      </tr>
-                    )
-                  })
-                )
-                : (
-                  <tr>
-                    <td colSpan={5} className="text-center py-6 text-gray-500">
-                      No problems found.
+                        )}
+                        <div className="tooltip tooltip-top" data-tip="Add To Playlist">
+                          <button
+                            className="btn btn-circle btn-info btn-outline"
+                            onClick={() => handleAddToPlaylist(problem.id)}
+                          >
+                            <Bookmark className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
                     </td>
                   </tr>
-                )
-
-            }
+                );
+              })
+            )}
           </tbody>
         </table>
       </div>
+
 
       {/* Pagination */}
       <div className="flex justify-center items-center mt-6 gap-2" >
