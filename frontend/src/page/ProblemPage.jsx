@@ -30,7 +30,7 @@ import SubmissionsList from "../components/SubmissionsList";
 
 const ProblemPage = () => {
     const { id } = useParams()
-    const { getProblemById, problem, isProblemLoading } = useProblemStore()
+    const { getProblemById, problem} = useProblemStore()
     const [code, setCode] = useState(problem?.codeSnippets["JAVASCRIPT"])
     const [activeTab, setActiveTab] = useState("description")
     const [selectedLanguage, setSelectedLanguage] = useState("JAVASCRIPT")
@@ -41,9 +41,6 @@ const ProblemPage = () => {
 
     const { isSubmissionLoading, submission: submissions, submissionCount, //naming submission as submissions coz due to deprication
         getSubmissionForProblem, getSubmissionCountForProblem } = usesubmissionStore()
-
-    console.log("submission after Run code:", submission);
-
 
     const handleRunCode = async (e) => {
         e.preventDefault();
@@ -59,8 +56,6 @@ const ProblemPage = () => {
             // Refresh real submissions
             await getSubmissionForProblem(id);
             await getSubmissionCountForProblem(id);
-
-
         } catch (err) {
             console.error("Error executing code", err);
         }
