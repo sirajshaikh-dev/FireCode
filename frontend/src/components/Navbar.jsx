@@ -5,20 +5,32 @@ import { Link } from "react-router-dom";
 
 import LogoutButton from "./LogoutButton";
 
+
+
 const Navbar = () => {
 
   const { authUser } = useAuthStore()
-
   console.log("AUTH_USER", authUser)
+
+  function getInitials(name = "") {
+    return name
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(word => word[0].toUpperCase())
+      .join("");
+  }
+  const initials = getInitials(authUser?.name);
+  const hasImage = Boolean(authUser?.avatar);
 
   return (
     <nav className="sticky top-0 z-50 w-full py-5">
       <div className="flex w-full justify-between mx-auto max-w-4xl bg-black/15 shadow-lg shadow-neutral-600/5 backdrop-blur-lg border border-gray-200/10 p-4 rounded-2xl">
         {/* Logo Section */}
         <Link to="/" className="flex items-center gap-3 cursor-pointer">
-          <img src="/firecode.svg" alt="no image" className="h-18 w-18 bg-primary/20 text-primary border-none px-2 py-2 rounded-full" />
-          <span className="text-lg md:text-2xl font-bold tracking-tight text-primary hidden md:block">
-            Firecode🔥
+          <img src="/firecode.svg" alt="Firecode Logo" className="h-10 w-10" />
+          <span className="text-lg md:text-2xl font-bold tracking-tight md:block ">
+            Firecode
           </span>
         </Link>
 
@@ -27,14 +39,16 @@ const Navbar = () => {
           <div className="dropdown dropdown-end">
             <label tabIndex={0} className="btn btn-ghost btn-circle avatar flex flex-row ">
               <div className="w-10 rounded-full ">
-                <img
-                  src={
-                    authUser?.image ||
-                    "https://avatar.iran.liara.run/public/boy"
-                  }
-                  alt="User Avatar"
-                  className="object-cover"
-                />
+                {hasImage ? (
+                  <img
+                    src={authUser.avatar}
+                    alt={authUser.name} className="object-cover"
+                    loading="lazy"
+                  />) : (
+                  <div className="h-10 w-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-md select-none">
+                    {initials}
+                  </div>
+                )}
               </div>
 
             </label>
@@ -46,9 +60,7 @@ const Navbar = () => {
               {/* Common Options */}
               <li>
                 <p className="text-base font-semibold">
-
                   {authUser?.name}
-
                 </p>
                 <hr className="border-gray-200/10" />
               </li>
@@ -61,7 +73,7 @@ const Navbar = () => {
                   My Profile
                 </Link>
               </li>
-              
+
               {/* Admin Option */}
 
               {authUser?.role === "ADMIN" && (
