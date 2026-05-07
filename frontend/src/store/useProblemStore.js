@@ -9,6 +9,7 @@ export const useProblemStore = create((set, get) => ({
   isProblemsLoading: false,
   isProblemLoading: false,
   isDeletingProblem: false,
+  isUpdatingProblem: false,
 
   getAllProblems: async () => {
     try {
@@ -67,6 +68,29 @@ export const useProblemStore = create((set, get) => ({
       get().getAllProblems();
     } finally {
       set({ isDeletingProblem: false })
+    }
+  },
+
+  updateProblem: async (id, updatedData) => {
+    try {
+      set({ isUpdatingProblem: true });
+
+      const res = await axiosInstance.put(`/problems/update-problem/${id}`, updatedData);
+
+      // Update the problem in local state
+      set((state) => ({
+        problems: state.problems.map(problem =>
+          problem.id === id ? { ...problem, ...res.data.problem } : problem
+        )
+      }));
+      toast.success("Problem updated successfully");
+      return { success: true, data: res.data.problem };
+    } catch (error) {
+      console.log("Error updating problem", error);
+      toast.error(error.response?.data?.error || "Failed to update problem");
+      return { success: false, message: error.message };
+    } finally {
+      set({ isUpdatingProblem: false });
     }
   },
 
