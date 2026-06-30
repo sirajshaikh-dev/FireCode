@@ -34,67 +34,84 @@ const Navbar = () => {
           </span>
         </Link>
 
-        {/* User Profile and Dropdown */}
-        <div className="flex items-center gap-8">
-          <div className="dropdown dropdown-end">
-            <label tabIndex={0} className="btn btn-ghost btn-circle avatar flex flex-row ">
-              <div className="w-10 rounded-full ">
-                {hasImage ? (
-                  <img
-                    src={authUser.avatar}
-                    alt={authUser.name} className="object-cover"
-                    loading="lazy"
-                  />) : (
-                  <div className="h-10 w-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-md select-none">
-                    {initials}
-                  </div>
-                )}
-              </div>
+        {/* User Profile and Dropdown / Auth Buttons */}
+        <div className="flex items-center gap-4">
+          {authUser ? (
+            <div className="dropdown dropdown-end">
+              <label tabIndex={0} className="btn btn-ghost btn-circle avatar flex flex-row ">
+                <div className="w-10 rounded-full ">
+                  {hasImage ? (
+                    <img
+                      src={authUser.avatar}
+                      alt={authUser.name} className="object-cover"
+                      loading="lazy"
+                    />) : (
+                    <div className="h-10 w-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-md select-none">
+                      {initials}
+                    </div>
+                  )}
+                </div>
 
-            </label>
-            <ul
-              tabIndex={0}
-              className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52 space-y-3"
-            >
+              </label>
+              <ul
+                tabIndex={0}
+                className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52 space-y-3"
+              >
 
-              {/* Common Options */}
-              <li>
-                <p className="text-base font-semibold">
-                  {authUser?.name}
-                </p>
-                <hr className="border-gray-200/10" />
-              </li>
-              <li>
-                <Link
-                  to="/profile"
-                  className="hover:bg-primary hover:text-white text-base font-semibold"
-                >
-                  <User className="w-4 h-4 mr-2" />
-                  My Profile
-                </Link>
-              </li>
-
-              {/* Admin Option */}
-
-              {authUser?.role === "ADMIN" && (
+                {/* Common Options */}
+                <li>
+                  <p className="text-base font-semibold">
+                    {authUser?.name}
+                  </p>
+                  <hr className="border-gray-200/10" />
+                </li>
                 <li>
                   <Link
-                    to="/add-problem"
+                    to="/profile"
                     className="hover:bg-primary hover:text-white text-base font-semibold"
                   >
-                    <Code className="w-4 h-4 mr-1" />
-                    Add Problem
+                    <User className="w-4 h-4 mr-2" />
+                    My Profile
                   </Link>
                 </li>
-              )}
-              <li>
-                <LogoutButton className="hover:bg-primary hover:text-white">
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Logout
-                </LogoutButton>
-              </li>
-            </ul>
-          </div>
+
+                {/* Admin Option */}
+
+                {authUser?.role === "ADMIN" && (
+                  <li>
+                    <Link
+                      to="/add-problem"
+                      className="hover:bg-primary hover:text-white text-base font-semibold"
+                    >
+                      <Code className="w-4 h-4 mr-1" />
+                      Add Problem
+                    </Link>
+                  </li>
+                )}
+                <li>
+                  <LogoutButton className="hover:bg-primary hover:text-white">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </LogoutButton>
+                </li>
+              </ul>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <Link
+                to="/login"
+                className="btn btn-ghost text-base font-semibold hover:bg-base-200"
+              >
+                Log In
+              </Link>
+              <Link
+                to="/signup"
+                className="btn btn-primary text-base font-semibold shadow-md shadow-primary/20"
+              >
+                Sign Up
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </nav>

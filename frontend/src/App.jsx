@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { useAuthStore } from './store/useAuthStore'
 import { Loader } from 'lucide-react'
@@ -14,6 +14,7 @@ import ProblemPage from './page/ProblemPage'
 
 const App = () => {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore()
+  const location = useLocation()
 
   useEffect(() => {
     checkAuth()
@@ -33,22 +34,22 @@ const App = () => {
         <Route path='/' element={<Layout />}>
           <Route
             index
-            element={authUser ? <HomePage /> : <Navigate to={'/login'} />}
+            element={<HomePage />}
           />
         </Route>
 
         <Route
           path='/login'
-          element={!authUser ? <LoginPage /> : <Navigate to={'/'} />}
+          element={!authUser ? <LoginPage /> : <Navigate to={location.state?.from || '/'} replace />}
         />
         <Route
           path='/signup'
-          element={!authUser ? <SignupPage /> : <Navigate to={'/'} />}
+          element={!authUser ? <SignupPage /> : <Navigate to={location.state?.from || '/'} replace />}
         />
 
         <Route
           path='/problem/:id'
-          element={authUser ? <ProblemPage /> : <Navigate to={"/login"} />}
+          element={<ProblemPage />}
         />
 
         <Route element={<AdminRoute />}>

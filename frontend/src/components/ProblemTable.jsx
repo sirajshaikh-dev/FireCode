@@ -2,6 +2,7 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Bookmark, PencilIcon, TrashIcon, Plus, OptionIcon, MoveLeftIcon, MoveRightIcon, Loader, Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 import { useAuthStore } from "../store/useAuthStore";
 import { useProblemStore } from "../store/useProblemStore";
 import { usePlaylistStore } from "../store/usePlaylistStore";
@@ -25,6 +26,10 @@ const ProblemTable = () => {
 
   const ModalRef = useRef(null);
   const openModal = () => {
+    if (!authUser) {
+      toast.error("Please log in to create a playlist");
+      return;
+    }
     if (ModalRef.current) {
       ModalRef.current.showModal();
     }
@@ -97,6 +102,10 @@ const ProblemTable = () => {
   };
 
   const handleAddToPlaylist = async (problemId) => {
+    if (!authUser) {
+      toast.error("Please log in to manage playlists");
+      return;
+    }
     // Open the AddToPlaylistModal and pass the problemId to it.
     openAddToPlaylistModal();
     setSelectedProblemId(problemId);
@@ -188,9 +197,9 @@ const ProblemTable = () => {
             ) : (
               // 🔹 Render problems when available
               paginatedProblems.map((problem) => {
-                const isSolved = problem.solvedBy.some(
+                const isSolved = problem.solvedBy?.some(
                   (user) => user.userId === authUser?.id
-                );
+                ) || false;
                 return (
                   <tr key={problem.id}>
                     <td>
