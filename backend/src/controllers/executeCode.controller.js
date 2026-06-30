@@ -3,18 +3,11 @@ import {
   pollBatchResults,
   submitBatch,
 } from "../lib/judge0.lib.js";
-import { db } from "../lib/db.js";
 
 export const executeCode = async (req, res) => {
   try {
     const { source_code, language_id, stdin, expected_outputs, problemId } =
       req.body;
-
-    // Check authentication
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
 
     // problemId Check
     if (!problemId) {
@@ -59,12 +52,6 @@ export const executeCode = async (req, res) => {
       const passed = stdout === expected_output;
       if (!passed) allPassed = false;
 
-      // console.log(`Testcase #${i + 1}`);
-      // console.log(`Input: ${stdin[i]}`);
-      // console.log(`Expected Output: ${expected_output}`);
-      // console.log(`Actual Output: ${stdout}`);
-      // console.log(`Matched: ${passed}`);
-
       return {
         testCase: i + 1,
         passed,
@@ -73,78 +60,54 @@ export const executeCode = async (req, res) => {
         stderr: result.stderr || null,
         compile_output: result.compile_output || null,
         status: result.status?.description || null,
-        memory: result.memory ? `${result.memory}KB` :undefined,
+        memory: result.memory ? `${result.memory}KB` : undefined,
         time: result.time ? `${result.time}s` : undefined, 
       };
     });
     console.log(`detailedResults---------`);
     console.log(detailedResults);
 
-    // 6. Store submission summary
-    const submission = await db.submission.create({
-      data: {
-        userId,
-        problemId,
-        sourceCode: source_code,
-        language: getLanguageName(language_id),
-        stdin: stdin.join("\n"),
-        stdout: JSON.stringify(detailedResults.map((r) => r.stdout)),
-        stderr: detailedResults.some((r) => r.stderr)
-          ? JSON.stringify(detailedResults.map((r) => r.stderr))
-          : null,
-        compileOutput: detailedResults.some((r) => r.compile_output)
-          ? JSON.stringify(detailedResults.map((r) => r.compile_output))
-          : null,
-        status: allPassed ? "Accepted" : "Wrong Answer",
-        memory: detailedResults.some((r) => r.memory !== null)
-          ? JSON.stringify(detailedResults.map((r) => r.memory))
-          : null,
-        time: detailedResults.some((r) => r.time !== null)
-          ? JSON.stringify(detailedResults.map((r) => r.time))
-          : null,
-      },
-    });
-
-    // 7. Mark problem as solved if all test cases passed
-    if (allPassed) {
-      await db.problemSolved.upsert({
-        where: {
-          userId_problemId: {
-            userId,
-            problemId,
-          },
-        },
-        update: {},
-        create: { userId, problemId },
-      });
-    }
-
-    // 8. Store each test case result
-    const testCaseResults = detailedResults.map((result) => ({
-      submissionId: submission.id,
-      testCase: result.testCase,
-      passed: result.passed,
-      stdout: result.stdout,
-      expected: result.expected,
-      stderr: result.stderr,
-      compileOutput: result.compile_output,
-      status: result.status,
-      memory: result.memory,
-      time: result.time,
-    }));
-
-    await db.testCaseResult.createMany({ data: testCaseResults });
-
-    // 9. Get submission with test cases
-    const submissionWithTestCase = await db.submission.findUnique({
-      where: { id: submission.id },
-      include: { testCases: true },
-    });
+    // 6. Construct stateless mock submission object
+    const mockSubmission = {
+      id: "run-submission",
+      userId: null,
+      problemId,
+      sourceCode: source_code,
+      language: getLanguageName(language_id),
+      stdin: stdin.join("\n"),
+      stdout: JSON.stringify(detailedResults.map((r) => r.stdout)),
+      stderr: detailedResults.some((r) => r.stderr)
+        ? JSON.stringify(detailedResults.map((r) => r.stderr))
+        : null,
+      compileOutput: detailedResults.some((r) => r.compile_output)
+        ? JSON.stringify(detailedResults.map((r) => r.compile_output))
+        : null,
+      status: allPassed ? "Accepted" : "Wrong Answer",
+      memory: detailedResults.some((r) => r.memory !== undefined)
+        ? JSON.stringify(detailedResults.map((r) => r.memory))
+        : null,
+      time: detailedResults.some((r) => r.time !== undefined)
+        ? JSON.stringify(detailedResults.map((r) => r.time))
+        : null,
+      testCases: detailedResults.map((result) => ({
+        id: `run-tc-${result.testCase}`,
+        submissionId: "run-submission",
+        testCase: result.testCase,
+        passed: result.passed,
+        stdout: result.stdout,
+        expected: result.expected,
+        stderr: result.stderr,
+        compileOutput: result.compile_output,
+        status: result.status,
+        memory: result.memory,
+        time: result.time,
+      }))
+    };
 
     res.status(200).json({
       success: true,
       message: "Code Executed Successfully!",
-      submission: submissionWithTestCase,
+      submission: mockSubmission,
     });
   } catch (error) {
     console.error("Error executing code:", error);
