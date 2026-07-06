@@ -71,7 +71,7 @@ const LoginForm = () => {
                             <input
                                 type="email"
                                 {...register("email")}
-                                className={`input input-bordered w-full pl-10 ${errors.email ? "input-error" : ""
+                                className={`input input-bordered w-full   ${errors.email ? "input-error" : ""
                                     }`}
                                 placeholder="you@example.com"
                             />
@@ -93,7 +93,7 @@ const LoginForm = () => {
                             <input
                                 type={showPassword ? "text" : "password"}
                                 {...register("password")}
-                                className={`input input-bordered w-full pl-10 ${errors.password ? "input-error" : ""
+                                className={`input input-bordered w-full ${errors.password ? "input-error" : ""
                                     }`}
                                 placeholder="••••••••"
                             />

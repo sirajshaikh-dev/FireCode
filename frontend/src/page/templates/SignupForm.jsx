@@ -72,7 +72,7 @@ const SignupForm = () => {
               <input
                 type="text"
                 {...register("name")}
-                className={`input input-bordered w-full pl-10 ${errors.name ? "input-error" : ""
+                className={`input input-bordered w-full  ${errors.name ? "input-error" : ""
                   }`}
                 placeholder="Shaikh Siraj"
               />
@@ -94,7 +94,7 @@ const SignupForm = () => {
               <input
                 type="email"
                 {...register("email")}
-                className={`input input-bordered w-full pl-10 ${errors.email ? "input-error" : ""
+                className={`input input-bordered w-full ${errors.email ? "input-error" : ""
                   }`}
                 placeholder="you@example.com"
               />
@@ -116,7 +116,7 @@ const SignupForm = () => {
               <input
                 type={showPassword ? "text" : "password"}
                 {...register("password")}
-                className={`input input-bordered w-full pl-10 ${errors.password ? "input-error" : ""
+                className={`input input-bordered w-full ${errors.password ? "input-error" : ""
                   }`}
                 placeholder="••••••••"
               />

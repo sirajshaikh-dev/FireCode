@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { X, Plus, Loader } from 'lucide-react'
 import { usePlaylistStore } from '../../store/usePlaylistStore'
+import { useAuthStore } from '../../store/useAuthStore'
 import CreatePlaylistModal from './CreatePlaylistModal'
 
 
 const AddToPlaylistModal = ({ ModalRef, closeModal, problemId }) => {
   const { playlists, getAllPlaylists, addProblemToPlaylist, isPlaylistLoading, createPlaylist } = usePlaylistStore()
+  const { authUser } = useAuthStore()
 
   const [selectedPlaylist, setSelectedPlaylist] = useState("");
   const [serverError, setServerError] = useState(null);
@@ -55,10 +57,10 @@ const AddToPlaylistModal = ({ ModalRef, closeModal, problemId }) => {
   }
 
   useEffect(() => {
-    if (ModalRef) {
+    if (ModalRef && authUser) {
       getAllPlaylists();
     }
-  }, [ModalRef, getAllPlaylists])
+  }, [ModalRef, getAllPlaylists, authUser])
 
 
   return (
