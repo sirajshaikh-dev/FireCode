@@ -4,8 +4,12 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon src/index.js",
+<<<<<<< HEAD
     "start": "node src/index.js",
     "build": "npm install && npx prisma generate"
+=======
+    "start": "node src/index.js"
+>>>>>>> a6a53c4335255a174d787f083c64ff0b7c9f50d8
   },
   "type": "module",
   "keywords": [],

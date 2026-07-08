@@ -51,6 +51,44 @@ export const authMiddleware = async (req,res,next) => {
     }
 }
 
+export const optionalAuthMiddleware = async (req, res, next) => {
+    try {
+        const token = req.cookies.jwt;
+
+        if (!token) {
+            return next();
+        }
+
+        let decoded;
+        try {
+            decoded = jwt.verify(token, process.env.JWT_SECRET);
+        } catch (error) {
+            return next();
+        }
+
+        const user = await db.user.findUnique({
+            where: {
+                id: decoded.id
+            },
+            select: {
+                id: true,
+                image: true,
+                name: true,
+                email: true,
+                role: true
+            }
+        });
+
+        if (user) {
+            req.user = user;
+        }
+        next();
+    } catch (error) {
+        console.log('Error in optionalAuthMiddleware', error);
+        next();
+    }
+}
+
 export const checkAdmin = async (req, res, next) => {
   try {
     const userId= req.user.id;

@@ -22,6 +22,7 @@ import { Link, useParams } from "react-router-dom";
 import { useProblemStore } from "../store/useProblemStore";
 import { useExecutionStore } from "../store/useExecutionStore";
 import { usesubmissionStore } from "../store/useSubmissionStore";
+import { useAuthStore } from "../store/useAuthStore";
 
 import { getLanguageIdByName } from "../lib/getLanguage";
 import SubmissionResults from "../components/SubmissionResults";
@@ -30,20 +31,19 @@ import SubmissionsList from "../components/SubmissionsList";
 
 const ProblemPage = () => {
     const { id } = useParams()
-    const { getProblemById, problem, isProblemLoading } = useProblemStore()
+    const { getProblemById, problem} = useProblemStore()
     const [code, setCode] = useState(problem?.codeSnippets["JAVASCRIPT"])
     const [activeTab, setActiveTab] = useState("description")
     const [selectedLanguage, setSelectedLanguage] = useState("JAVASCRIPT")
     const [isBookmarked, setIsBookmarked] = useState(false)
     const [testCases, setTestCases] = useState([])
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
 
-    const { executeCode, submission, isExecuting } = useExecutionStore()
+    const { executeCode, submitCode, clearSubmission, submission, isExecuting } = useExecutionStore()
+    const { authUser } = useAuthStore()
 
     const { isSubmissionLoading, submission: submissions, submissionCount, //naming submission as submissions coz due to deprication
         getSubmissionForProblem, getSubmissionCountForProblem } = usesubmissionStore()
-
-    console.log("submission after Run code:", submission);
-
 
     const handleRunCode = async (e) => {
         e.preventDefault();
@@ -53,16 +53,39 @@ const ProblemPage = () => {
             const stdin = problem.testCases.map(tc => tc.input);
             const expected_outputs = problem.testCases.map(tc => tc.output);
 
-            // Wait for Judge0 + DB
+            // Wait for Judge0 stateless execution
             await executeCode(code, language_id, stdin, expected_outputs, id);
 
-            // Refresh real submissions
-            await getSubmissionForProblem(id);
+            // Refresh real submissions if logged in
+            if (authUser) {
+                await getSubmissionForProblem(id);
+            }
             await getSubmissionCountForProblem(id);
-
-
         } catch (err) {
             console.error("Error executing code", err);
+        }
+    };
+
+    const handleSubmitCode = async (e) => {
+        e.preventDefault();
+
+        if (!authUser) {
+            setIsAuthModalOpen(true);
+            return;
+        }
+
+        try {
+            const language_id = getLanguageIdByName(selectedLanguage);
+            const stdin = problem.testCases.map(tc => tc.input);
+            const expected_outputs = problem.testCases.map(tc => tc.output);
+
+            await submitCode(code, language_id, stdin, expected_outputs, id);
+
+            // Refresh submissions
+            await getSubmissionForProblem(id);
+            await getSubmissionCountForProblem(id);
+        } catch (err) {
+            console.error("Error submitting code", err);
         }
     };
 
@@ -129,6 +152,17 @@ const ProblemPage = () => {
                     </div>
                 );
             case "submissions":
+                if (!authUser) {
+                    return (
+                        <div className="p-8 text-center text-base-content/70 flex flex-col items-center gap-3">
+                            <Users className="w-12 h-12 text-base-content/40" />
+                            <p className="text-lg">Please sign in to view your submission history.</p>
+                            <Link to="/login" state={{ from: `/problem/${id}` }} className="btn btn-primary btn-sm">
+                                Sign In
+                            </Link>
+                        </div>
+                    );
+                }
                 return <div className="p-4 text-center text-base-content/70"><SubmissionsList submissions={submissions} isSubmissionLoading={isSubmissionLoading} /></div>;
 
             // return <SubmissionsList submissions={submissions} isLoading={isSubmissionsLoading} />;
@@ -156,7 +190,8 @@ const ProblemPage = () => {
     useEffect(() => {
         getProblemById(id)
         getSubmissionCountForProblem(id)
-    }, [id, getProblemById, getSubmissionCountForProblem])
+        clearSubmission()
+    }, [id, getProblemById, getSubmissionCountForProblem, clearSubmission])
 
     useEffect(() => {
         if (problem) {
@@ -181,10 +216,10 @@ const ProblemPage = () => {
     /**Vibe code */
     // stable fetch function
     const fetchSubmissions = useCallback(() => {
-        if (activeTab === "submissions" && id) {
+        if (activeTab === "submissions" && id && authUser) {
             getSubmissionForProblem(id);
         }
-    }, [activeTab, id, getSubmissionForProblem]);
+    }, [activeTab, id, getSubmissionForProblem, authUser]);
 
     useEffect(() => {
         fetchSubmissions();
@@ -319,11 +354,21 @@ const ProblemPage = () => {
                                     </button>
 
                                     <button
-                                        type="submit"
+                                        onClick={handleSubmitCode}
+                                        disabled={isExecuting}
                                         className="btn btn-success gap-2"
                                     >
-                                        <Send className="w-4 h-4" />
-                                        Submit
+                                        {isExecuting ? (
+                                            <>
+                                                <span className="loading loading-spinner loading-sm"></span>
+                                                Submitting...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Send className="w-4 h-4" />
+                                                Submit
+                                            </>
+                                        )}
                                     </button>
                                 </div>
                             </div>
@@ -386,6 +431,48 @@ const ProblemPage = () => {
 
                 </div>
 
+                {isAuthModalOpen && (
+                    <div className="modal modal-open backdrop-blur-md bg-black/60 transition-all duration-300">
+                        <div className="modal-box border border-primary/20 bg-base-100/90 shadow-2xl rounded-2xl max-w-md relative overflow-hidden">
+                            {/* Ambient background glow */}
+                            <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/20 rounded-full blur-2xl"></div>
+                            <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-secondary/10 rounded-full blur-2xl"></div>
+
+                            <button 
+                                className="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"
+                                onClick={() => setIsAuthModalOpen(false)}
+                            >
+                                ✕
+                            </button>
+                            
+                            <div className="flex flex-col items-center text-center p-4">
+                                <div className="bg-primary/10 p-4 rounded-full mb-4 animate-bounce">
+                                    <Code2 className="w-12 h-12 text-primary" />
+                                </div>
+                                <h3 className="text-2xl font-bold text-base-content mb-2">Join FireCode</h3>
+                                <p className="text-base-content/70 mb-6">
+                                    Sign up or log in to submit your solution, verify all test cases, track your coding stats, and join the leaderboard!
+                                </p>
+                                <div className="flex flex-col sm:flex-row gap-3 w-full justify-center">
+                                    <Link 
+                                        to="/login" 
+                                        state={{ from: `/problem/${id}` }}
+                                        className="btn btn-primary flex-1 shadow-lg shadow-primary/20"
+                                    >
+                                        Log In
+                                    </Link>
+                                    <Link 
+                                        to="/signup" 
+                                        state={{ from: `/problem/${id}` }}
+                                        className="btn btn-outline btn-secondary flex-1"
+                                    >
+                                        Sign Up
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

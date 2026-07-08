@@ -11,6 +11,7 @@ import submissionRoutes from './routes/submission.routes.js';
 import playlistRoutes from './routes/playlist.routes.js';
 
 dotenv.config();
+<<<<<<< HEAD
 
 console.log("Judge0 URL:", process.env.JUDGE0_API_URL);
 console.log("Judge0 Key:", process.env.JUDGE0_API_KEY ? "Loaded ✅" : "Missing ❌");
@@ -23,6 +24,8 @@ console.log("Judge0 Key:", process.env.JUDGE0_API_KEY ? "Loaded ✅" : "Missing 
 // });
 // console.log("Languages:", res.data);
 
+=======
+>>>>>>> a6a53c4335255a174d787f083c64ff0b7c9f50d8
 
 const app = express();
 app.use(express.json())
@@ -30,11 +33,19 @@ app.use(cookieParser())
 app.use(
   cors({
     origin: [
+<<<<<<< HEAD
       "https://www.firecode.in",
       "https://leetlab-liard.vercel.app",
       "http://localhost:5173",
       "http://localhost:5174",
     ],
+=======
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "https://www.firecode.in",
+      "https://firecode.onrender.com",
+      ],
+>>>>>>> a6a53c4335255a174d787f083c64ff0b7c9f50d8
     credentials: true
   })
 )
