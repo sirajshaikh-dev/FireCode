@@ -17,16 +17,11 @@ const App = () => {
   const location = useLocation()
 
   useEffect(() => {
-    checkAuth()
-  }, [checkAuth])
-
-  if (isCheckingAuth && !authUser) {
-    return (
-      <div className='flex items-center justify-center h-screen'>
-        <Loader className='size-10 animate-spin' />
-      </div>
-    )
-  }
+    if (authUser){
+      checkAuth()
+    }
+  }, [checkAuth,authUser])
+  
   return (
     <div className='flex flex-col items-center justify-start'>
       <Toaster />

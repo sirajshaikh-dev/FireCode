@@ -17,6 +17,7 @@ import { useState } from 'react';
 import { axiosInstance } from "../lib/axios"
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { useProblemStore } from "../store/useProblemStore";
 
 const problemSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
@@ -572,6 +573,8 @@ const CreateProblemForm = () => {
       setIsLoading(true);
       const res = await axiosInstance.post("/problems/create-problem", value);
       console.log(res.data);
+      // Invalidate problems cache so the list fetches the newly created problem
+      useProblemStore.setState({ problems: [] });
       toast.success(res.data.message || "Problem Created Successfully 🔥");
       navigation("/");
     } catch (error) {

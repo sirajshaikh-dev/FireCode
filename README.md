@@ -1,6 +1,6 @@
-# 🧠 LeetLab – A Leetcode-Inspired Coding Platform
+# 🔥 firecode – A Leetcode-Inspired Coding Platform
 
-> **LeetLab** is a full-stack, Leetcode-style coding practice platform that enables developers to **solve coding problems**, **run and submit code**, and **track performance** across multiple programming languages — all within a modern, responsive UI.
+> **firecode** is a full-stack, Leetcode-style coding practice platform that enables developers to **solve coding problems**, **run and submit code**, and **track performance** across multiple programming languages — all within a modern, responsive UI.
 
 ---
 ## 📸 Screenshots

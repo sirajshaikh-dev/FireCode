@@ -22,13 +22,13 @@ app.use(
       "http://localhost:5174",
       "https://www.firecode.in",
       "https://firecode.onrender.com",
-      ],
+    ],
     credentials: true
   })
 )
 
 app.get('/', (req, res) => {
-  res.send('welcome to leetlab')
+  res.send('welcome to firecode')
 })
 
 app.use('/api/v1/auth', authRoutes)

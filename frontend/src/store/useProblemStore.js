@@ -11,7 +11,12 @@ export const useProblemStore = create((set, get) => ({
   isDeletingProblem: false,
   isUpdatingProblem: false,
 
-  getAllProblems: async () => {
+  getAllProblems: async (force = false) => {
+    // Return early if problems are already cached and we aren't forcing a refresh
+    if (get().problems.length > 0 && !force) {
+      return;
+    }
+
     try {
       set({ isProblemsLoading: true });
       const res = await axiosInstance.get("/problems/get-all-problems");
@@ -65,7 +70,7 @@ export const useProblemStore = create((set, get) => ({
       toast.error("Failed to delete problem");
 
       // Rollback: restore the problem if API fails
-      get().getAllProblems();
+      get().getAllProblems(true);
     } finally {
       set({ isDeletingProblem: false })
     }
