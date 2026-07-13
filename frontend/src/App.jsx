@@ -17,10 +17,12 @@ const App = () => {
   const location = useLocation()
 
   useEffect(() => {
-    if (authUser){
-      checkAuth()
+    // Only verify session on mount if the user has a persisted session in localStorage
+    const hasSession = useAuthStore.getState().authUser;
+    if (hasSession) {
+      checkAuth();
     }
-  }, [checkAuth,authUser])
+  }, [checkAuth]);
   
   return (
     <div className='flex flex-col items-center justify-start'>
