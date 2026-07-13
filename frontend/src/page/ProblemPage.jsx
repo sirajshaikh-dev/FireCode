@@ -310,8 +310,11 @@ const ProblemPage = () => {
     useEffect(() => {
         getProblemById(id);
         getSubmissionCountForProblem(id);
+        if (authUser) {
+            getSubmissionForProblem(id);
+        }
         clearSubmission();
-    }, [id, getProblemById, getSubmissionCountForProblem, clearSubmission]);
+    }, [id, getProblemById, getSubmissionCountForProblem, clearSubmission, authUser, getSubmissionForProblem]);
 
     useEffect(() => {
         if (problem) {
@@ -327,16 +330,6 @@ const ProblemPage = () => {
             setActiveResultCaseIndex(0);
         }
     }, [problem, selectedLanguage]);
-
-    const fetchSubmissions = useCallback(() => {
-        if (activeTab === "submissions" && id && authUser) {
-            getSubmissionForProblem(id);
-        }
-    }, [activeTab, id, getSubmissionForProblem, authUser]);
-
-    useEffect(() => {
-        fetchSubmissions();
-    }, [fetchSubmissions]);
 
     function getInitials(name = "") {
         return name
