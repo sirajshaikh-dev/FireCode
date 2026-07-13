@@ -22,7 +22,7 @@ export const useProblemStore = create((set, get) => ({
       const res = await axiosInstance.get("/problems/get-all-problems");
       set({ problems: res.data.problems });
     } catch (error) {
-      console.log("Error getting all problems", error);
+      // console.log("Error getting all problems", error);
       toast.error("Error in getting problems");
     } finally {
       set({ isProblemsLoading: false });
@@ -36,7 +36,7 @@ export const useProblemStore = create((set, get) => ({
       set({ problem: res.data.problem });
       // toast.success(res.data.message);
     } catch (error) {
-      console.log("Error getting problem By Id", error);
+      // console.log("Error getting problem By Id", error);
       toast.error("Error in getting problem by Id");
     } finally {
       set({ isProblemLoading: false });
@@ -48,7 +48,7 @@ export const useProblemStore = create((set, get) => ({
       const res = await axiosInstance.get("/problems/get-solved-problem");
       set({ solvedProblems: res.data.problems });
     } catch (error) {
-      console.log("Error getting Solved Problems", error);
+      // console.log("Error getting Solved Problems", error);
       toast.error("Error getting Solved Problems");
     }
   },
@@ -66,7 +66,7 @@ export const useProblemStore = create((set, get) => ({
       toast.success("Problem Deleted")
 
     } catch (error) {
-      console.log("Error Deleting Problem", error);
+      // console.log("Error Deleting Problem", error);
       toast.error("Failed to delete problem");
 
       // Rollback: restore the problem if API fails
@@ -91,7 +91,7 @@ export const useProblemStore = create((set, get) => ({
       toast.success("Problem updated successfully");
       return { success: true, data: res.data.problem };
     } catch (error) {
-      console.log("Error updating problem", error);
+      // console.log("Error updating problem", error);
       toast.error(error.response?.data?.error || "Failed to update problem");
       return { success: false, message: error.message };
     } finally {

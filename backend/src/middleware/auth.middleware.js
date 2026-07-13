@@ -46,7 +46,7 @@ export const authMiddleware = async (req,res,next) => {
         req.user=user;
         next( )
     } catch (error) {
-        console.log('Error creating user')
+        // console.log('Error creating user')
         res.status(500).json({message:"Error authenticating user"})
     }
 }
@@ -84,7 +84,7 @@ export const optionalAuthMiddleware = async (req, res, next) => {
         }
         next();
     } catch (error) {
-        console.log('Error in optionalAuthMiddleware', error);
+        // console.log('Error in optionalAuthMiddleware', error);
         next();
     }
 }
@@ -103,7 +103,7 @@ export const checkAdmin = async (req, res, next) => {
     }
     next();
   } catch (error) {
-    console.error('Error checking admin role:', error);
+    // console.error('Error checking admin role:', error);
     res.status(500).json({
       message: "Error checking admin role"
     });

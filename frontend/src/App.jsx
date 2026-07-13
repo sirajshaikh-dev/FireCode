@@ -17,10 +17,11 @@ const App = () => {
   const location = useLocation()
 
   useEffect(() => {
-    if (authUser){
-      checkAuth()
+      const hasSession = useAuthStore.getState().authUser;
+    if (hasSession) {
+      checkAuth();
     }
-  }, [checkAuth,authUser])
+  }, [checkAuth]);
   
   return (
     <div className='flex flex-col items-center justify-start'>

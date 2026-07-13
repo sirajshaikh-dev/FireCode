@@ -19,7 +19,7 @@ export const usePlaylistStore = create((set, get) => ({
             return res.data.playlist
         } catch (error) {
             const message = error.response?.data?.error || "Something went wrong"
-            console.log("Error creating Playlist", message);
+            // console.log("Error creating Playlist", message);
             throw new Error(message)
         } finally {
             set({ isPlaylistLoading: false })
@@ -33,7 +33,7 @@ export const usePlaylistStore = create((set, get) => ({
             const res = await axiosInstance.get('/playlist')
             set({ playlists: res.data.playlists })
         } catch (error) {
-            console.log("Error fetching playlist details", error);
+            // console.log("Error fetching playlist details", error);
             toast.error("Failed to fetch playlist details")
         } finally {
             set({ isPlaylistLoading: false })
@@ -46,7 +46,7 @@ export const usePlaylistStore = create((set, get) => ({
             const res = await axiosInstance.get(`/playlist/${playlistId}`)
             set({ currentPlaylist: res.data.playlist })
         } catch (error) {
-            console.log("Error gettting playlist details", error);
+            // console.log("Error gettting playlist details", error);
             toast.error("Failed to fetch playlist details")
         } finally {
             set({ isPlaylistLoading: false })
@@ -70,7 +70,7 @@ export const usePlaylistStore = create((set, get) => ({
             return { success: true, message: "Added Successfully" };
 
         } catch (error) {
-            console.log('Error adding problem to playlist', error);
+            // console.log('Error adding problem to playlist', error);
             return { success: false, message: "You have already added this problem to this playlist." };
 
         } finally {
@@ -87,7 +87,7 @@ export const usePlaylistStore = create((set, get) => ({
                 problemIds
             )
         } catch (error) {
-            console.error("Error removing problem from playlist", error);
+            // console.error("Error removing problem from playlist", error);
             toast.error("Failed to remove remove problem from playlist")
         } finally {
             set({ isPlaylistLoading: false })
@@ -104,7 +104,7 @@ export const usePlaylistStore = create((set, get) => ({
             }))
             toast.success("Playlist deleted successfully")
         } catch (error) {
-            console.error("Error deleting problem", error);
+            // console.error("Error deleting problem", error);
             toast.error("Failed to delete Playlist")
         } finally {
             Set({ isPlaylistLoading: false })

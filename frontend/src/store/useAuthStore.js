@@ -16,7 +16,7 @@ export const useAuthStore = create(
         try {
           const res = await axiosInstance.get("/auth/checkme");
           // convert res to json later
-          console.log("Check auth response", res.data.user);
+          // console.log("Check auth response", res.data.user);
 
           set({ authUser: res.data.user });
         } catch (error) {
@@ -29,14 +29,14 @@ export const useAuthStore = create(
 
       signup: async (data) => {
         set({ isSigninUp: true });
-        console.log("signup data ", data);
+        // console.log("signup data ", data);
         try {
           const res = await axiosInstance.post("/auth/register", data);
           set({ authUser: res.data.user });
 
           toast.success(res.data.message);
         } catch (error) {
-          console.log("Failed to signup", error);
+          // console.log("Failed to signup", error);
           toast.error("Error Signup user");
         } finally {
           set({ isSigninUp: false });
@@ -44,7 +44,7 @@ export const useAuthStore = create(
       },
 
       login: async (data) => {
-        console.log("login data ", data);
+        // console.log("login data ", data);
         set({ isLoggingIn: true });
         try {
           const res = await axiosInstance.post("/auth/login", data, {
@@ -57,7 +57,7 @@ export const useAuthStore = create(
           // Optionally verify cookie/session asynchronously
           // await useAuthStore.getState().checkAuth()
         } catch (error) {
-          console.log("Error login user", error);
+          // console.log("Error login user", error);
           toast.error("Error login user");
         } finally {
           set({ isLoggingIn: false });
@@ -69,7 +69,7 @@ export const useAuthStore = create(
           set({ authUser: null });
           toast.success("Logout success");
         } catch (error) {
-          console.log("Error logout", error);
+          // console.log("Error logout", error);
           toast.error("Error logout user");
         }
       },

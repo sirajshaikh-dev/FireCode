@@ -10,7 +10,7 @@ import LogoutButton from "./LogoutButton";
 const Navbar = () => {
 
   const { authUser } = useAuthStore()
-  console.log("AUTH_USER", authUser)
+  // console.log("AUTH_USER", authUser)
 
   function getInitials(name = "") {
     return name

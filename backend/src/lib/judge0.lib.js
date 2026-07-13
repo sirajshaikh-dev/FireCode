@@ -29,7 +29,7 @@ export const pollBatchResults = async (tokens) => {
         })
         const results = data.submissions
 
-        console.log('Polling Results:', results)
+        // console.log('Polling Results:', results)
 
         const isAllDone = results.every(
             (res) => res.status.id !== 1 && res.status.id !== 2 // 1-> In Queue, 2-> Processing
@@ -44,7 +44,7 @@ export const submitBatch = async (submissions) => {
     const { data } = await judge0.post(`${process.env.JUDGE0_API_URL}/submissions/batch?base64_encoded=false`, {
         submissions
     })
-    console.log('Submission response', data)
+    // console.log('Submission response', data)
 
     return data //[{token},{token},{token}]
 }

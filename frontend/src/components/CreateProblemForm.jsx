@@ -572,13 +572,13 @@ const CreateProblemForm = () => {
       // stringify the data
       setIsLoading(true);
       const res = await axiosInstance.post("/problems/create-problem", value);
-      console.log(res.data);
+      // console.log(res.data);
       // Invalidate problems cache so the list fetches the newly created problem
       useProblemStore.setState({ problems: [] });
       toast.success(res.data.message || "Problem Created Successfully 🔥");
       navigation("/");
     } catch (error) {
-      console.log("Error creating problem", error);
+      // console.log("Error creating problem", error);
       toast.error("Error creating problem");
     } finally {
       setIsLoading(false);

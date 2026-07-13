@@ -79,7 +79,7 @@ export const createProblem = async (req, res) => {
         },
       });
 
-      console.log("Problem created successfully:", newProblem);
+      // console.log("Problem created successfully:", newProblem);
 
       return res.status(201).json({
         message: "Problem created successfully",
@@ -87,7 +87,7 @@ export const createProblem = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error("Error creating problem:", error);
+    // console.error("Error creating problem:", error);
     return res.status(500).json({
       error: "Internal server error",
       details: error.message,
@@ -120,7 +120,7 @@ export const getAllProblems = async (req, res) => {
       problems,
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(500).json({
       error: "Error fetching problems",
     });
@@ -147,7 +147,7 @@ export const getProblemById = async (req, res) => {
       problem,
     });
   } catch (error) {
-    console.log("Error fetching problem by id:", error);
+    // console.log("Error fetching problem by id:", error);
     return res.status(500).json({
       error: "Error fetching problem by id",
     });
@@ -240,7 +240,7 @@ export const updateProblem = async (req, res) => {
       data: updateData,
     });
 
-    console.log("Problem updated successfully:", updatedProblem);
+    // console.log("Problem updated successfully:", updatedProblem);
 
     return res.status(200).json({
       success: true,
@@ -248,7 +248,7 @@ export const updateProblem = async (req, res) => {
       problem: updatedProblem,
     });
   } catch (error) {
-    console.error("Error updating problem:", error);
+    // console.error("Error updating problem:", error);
     return res.status(500).json({
       error: "Internal server error",
       details: error.message,
@@ -271,7 +271,7 @@ export const delteleProblem = async (req, res) => {
       message: "Problem deleted successfully",
     });
   } catch (error) {
-    console.log("Error delating problem", error);
+    // console.log("Error delating problem", error);
     return res.status(500).json({
       error: "Error delating problem",
     });
@@ -302,7 +302,7 @@ export const getAllProblemsSolvedByUser = async (req, res) => {
       problems,
     });
   } catch (error) {
-    console.log(`error fetching problems`, error);
+    // console.log(`error fetching problems`, error);
     res.status(500).json({ error: "Failed to fetch problem" });
   }
 };

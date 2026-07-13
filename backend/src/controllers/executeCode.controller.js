@@ -41,9 +41,9 @@ export const executeCode = async (req, res) => {
       return res.status(500).json({ error: "No results from Judge0" });
     }
 
-    console.log("----------");
+    // console.log("----------");
     console.log("Executed Code Result:", results);
-
+// 
     // 5. Analyze test case results
     let allPassed = true;
     const detailedResults = results.map((result, i) => {
@@ -64,8 +64,8 @@ export const executeCode = async (req, res) => {
         time: result.time ? `${result.time}s` : undefined, 
       };
     });
-    console.log(`detailedResults---------`);
-    console.log(detailedResults);
+    // console.log(`detailedResults---------`);
+    // console.log(detailedResults);
 
     // 6. Construct stateless mock submission object
     const mockSubmission = {
@@ -110,7 +110,7 @@ export const executeCode = async (req, res) => {
       submission: mockSubmission,
     });
   } catch (error) {
-    console.error("Error executing code:", error);
+    // console.error("Error executing code:", error);
     res.status(500).json({ error: "Failed to execute code" });
   }
 };
