@@ -1,23 +1,6 @@
-import React, { useState, useEffect, useCallback } from "react";
-import Editor from "@monaco-editor/react";
-import {
-    Play,
-    FileText,
-    MessageSquare,
-    Lightbulb,
-    Bookmark,
-    Share2,
-    Clock,
-    ChevronRight,
-    BookOpen,
-    Terminal,
-    Code2,
-    Users,
-    ThumbsUp,
-    Home,
-    Send
-} from "lucide-react";
-import { Link, useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { Code2 } from "lucide-react";
 
 import { useProblemStore } from "../store/useProblemStore";
 import { useExecutionStore } from "../store/useExecutionStore";
@@ -25,33 +8,80 @@ import { usesubmissionStore } from "../store/useSubmissionStore";
 import { useAuthStore } from "../store/useAuthStore";
 
 import { getLanguageIdByName } from "../lib/getLanguage";
-import SubmissionResults from "../components/SubmissionResults";
-import SubmissionsList from "../components/SubmissionsList";
-
+import ProblemHeader from "../components/problems/ProblemHeader";
+import ProblemDescription from "../components/problems/ProblemDescription";
+import CodeEditor from "../components/problems/CodeEditor";
+import ConsolePanel from "../components/problems/ConsolePanel";
 
 const ProblemPage = () => {
-    const { id } = useParams()
-    const { getProblemById, problem} = useProblemStore()
-    const [code, setCode] = useState(problem?.codeSnippets["JAVASCRIPT"])
-    const [activeTab, setActiveTab] = useState("description")
-    const [selectedLanguage, setSelectedLanguage] = useState("JAVASCRIPT")
-    const [isBookmarked, setIsBookmarked] = useState(false)
-    const [testCases, setTestCases] = useState([])
-    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+    const { id } = useParams();
+    const navigate = useNavigate();
 
-    const { executeCode, submitCode, clearSubmission, submission, isExecuting } = useExecutionStore()
-    const { authUser } = useAuthStore()
+    const { getProblemById, problem, getAllProblems, problems } = useProblemStore();
+    const [code, setCode] = useState("");
+    const [activeTab, setActiveTab] = useState("description");
+    const [consoleTab, setConsoleTab] = useState("testcase");
+    const [selectedLanguage, setSelectedLanguage] = useState("JAVASCRIPT");
+    const [isBookmarked, setIsBookmarked] = useState(false);
+    const [testCases, setTestCases] = useState([]);
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-    const { isSubmissionLoading, submission: submissions, submissionCount, //naming submission as submissions coz due to deprication
-        getSubmissionForProblem, getSubmissionCountForProblem } = usesubmissionStore()
+    // Resizable split widths
+    const [leftWidth, setLeftWidth] = useState(50); // percentage for vertical split
+    const [editorHeight, setEditorHeight] = useState(65); // percentage for horizontal split on right
+
+    // Console testcase tracking
+    const [activeTestCaseIndex, setActiveTestCaseIndex] = useState(0);
+    const [activeResultCaseIndex, setActiveResultCaseIndex] = useState(0);
+
+    const { executeCode, submitCode, clearSubmission, submission, isExecuting } = useExecutionStore();
+    const { authUser } = useAuthStore();
+
+    const { 
+        isSubmissionLoading, 
+        submission: submissions, 
+        submissionCount, 
+        getSubmissionForProblem, 
+        getSubmissionCountForProblem 
+    } = usesubmissionStore();
+
+    // Fetch all problems once to allow Prev / Next navigation
+    useEffect(() => {
+        getAllProblems();
+    }, [getAllProblems]);
+
+    // Problem lists navigation calculations
+    const currentIndex = problems.findIndex((p) => p.id === id || p._id === id);
+    const prevProblem = currentIndex > 0 ? problems[currentIndex - 1] : null;
+    const nextProblem = currentIndex < problems.length - 1 ? problems[currentIndex + 1] : null;
+
+    const handlePrevProblem = () => {
+        if (prevProblem) {
+            navigate(`/problem/${prevProblem.id}`);
+        }
+    };
+
+    const handleNextProblem = () => {
+        if (nextProblem) {
+            navigate(`/problem/${nextProblem.id}`);
+        }
+    };
+
+    const handleRandomProblem = () => {
+        if (problems.length > 0) {
+            const randomIndex = Math.floor(Math.random() * problems.length);
+            const randomProb = problems[randomIndex];
+            navigate(`/problem/${randomProb.id}`);
+        }
+    };
 
     const handleRunCode = async (e) => {
         e.preventDefault();
-
+        setConsoleTab("result"); // Auto-switch to test result tab
         try {
             const language_id = getLanguageIdByName(selectedLanguage);
-            const stdin = problem.testCases.map(tc => tc.input);
-            const expected_outputs = problem.testCases.map(tc => tc.output);
+            const stdin = testCases.map(tc => tc.input);
+            const expected_outputs = testCases.map(tc => tc.output);
 
             // Wait for Judge0 stateless execution
             await executeCode(code, language_id, stdin, expected_outputs, id);
@@ -74,6 +104,7 @@ const ProblemPage = () => {
             return;
         }
 
+        setConsoleTab("result"); // Auto-switch to test result tab
         try {
             const language_id = getLanguageIdByName(selectedLanguage);
             const stdin = problem.testCases.map(tc => tc.input);
@@ -89,395 +120,242 @@ const ProblemPage = () => {
         }
     };
 
-
     const handleLanguageChange = (e) => {
         const lang = e.target.value;
-        setSelectedLanguage(lang)
-        setCode(problem.codeSnippets?.[lang] || "")
-    }
+        setSelectedLanguage(lang);
+        setCode(problem.codeSnippets?.[lang] || "");
+    };
 
-    const renderTabContent = () => {
-        switch (activeTab) {
-            case "description":
-                return (
-                    <div className="prose max-w-none">
-                        <p className="text-lg mb-6">{problem.description}</p>
-
-                        {problem.examples && (
-                            <>
-                                <h3 className="text-xl font-bold mb-4">Examples:</h3>
-                                {Object.entries(problem.examples).map(([lang, example]) => (
-                                    <div key={lang} className="bg-base-200 p-6 rounded-xl mb-6 font-mono">
-                                        <div className="mb-4">
-                                            <div className="text-indigo-300 mb-2 text-base font-semibold">
-                                                Input:
-                                            </div>
-                                            <span className="bg-black/90 px-4 py-1 rounded-lg font-semibold text-white">
-                                                {example.input}
-                                            </span>
-                                        </div>
-                                        <div className="mb-4">
-                                            <div className="text-indigo-300 mb-2 text-base font-semibold">
-                                                Output:
-                                            </div>
-                                            <span className="bg-black/90 px-4 py-1 rounded-lg font-semibold text-white">
-                                                {example.output}
-                                            </span>
-                                        </div>
-                                        {example.explanation && (
-                                            <div>
-                                                <div className="text-emerald-300 mb-2 text-base font-semibold">
-                                                    Explanation:
-                                                </div>
-                                                <p className="text-base-content/70 text-lg font-sem">
-                                                    {example.explanation}
-                                                </p>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </>
-                        )}
-
-                        {problem.constraints && (
-                            <>
-                                <h3 className="text-xl font-bold mb-4">Constraints:</h3>
-                                <div className="bg-base-200 p-6 rounded-xl mb-6">
-                                    <span className="bg-black/90 px-4 py-1 rounded-lg font-semibold text-white text-lg">
-                                        {problem.constraints}
-                                    </span>
-                                </div>
-                            </>
-                        )}
-                    </div>
-                );
-            case "submissions":
-                if (!authUser) {
-                    return (
-                        <div className="p-8 text-center text-base-content/70 flex flex-col items-center gap-3">
-                            <Users className="w-12 h-12 text-base-content/40" />
-                            <p className="text-lg">Please sign in to view your submission history.</p>
-                            <Link to="/login" state={{ from: `/problem/${id}` }} className="btn btn-primary btn-sm">
-                                Sign In
-                            </Link>
-                        </div>
-                    );
-                }
-                return <div className="p-4 text-center text-base-content/70"><SubmissionsList submissions={submissions} isSubmissionLoading={isSubmissionLoading} /></div>;
-
-            // return <SubmissionsList submissions={submissions} isLoading={isSubmissionsLoading} />;
-            case "discussion":
-                return <div className="p-4 text-center text-base-content/70">No discussions yet</div>;
-            case "hints":
-                return (
-                    <div className="p-4">
-                        {problem?.hints ? (
-                            <div className="bg-base-200 p-6 rounded-xl">
-                                <span className="bg-black/90 px-4 py-1 rounded-lg font-semibold text-white text-lg">
-                                    {problem.hints}
-                                </span>
-                            </div>
-                        ) : (
-                            <div className="text-center text-base-content/70">No hints available</div>
-                        )}
-                    </div>
-                );
-            default:
-                return null;
+    const handleResetCode = () => {
+        if (window.confirm("Are you sure you want to reset your code template to default?")) {
+            setCode(problem.codeSnippets?.[selectedLanguage] || "");
         }
     };
 
+    const handleAddTestCase = () => {
+        setTestCases([...testCases, { input: "", output: "" }]);
+        setActiveTestCaseIndex(testCases.length);
+    };
+
+    // Vertical Resizer dragging handler
+    const handleVerticalMouseDown = (e) => {
+        e.preventDefault();
+        const handleMouseMove = (moveEvent) => {
+            const percentage = (moveEvent.clientX / window.innerWidth) * 100;
+            if (percentage > 25 && percentage < 75) {
+                setLeftWidth(percentage);
+            }
+        };
+        const handleMouseUp = () => {
+            window.removeEventListener("mousemove", handleMouseMove);
+            window.removeEventListener("mouseup", handleMouseUp);
+        };
+        window.addEventListener("mousemove", handleMouseMove);
+        window.addEventListener("mouseup", handleMouseUp);
+    };
+
+    // Horizontal Resizer dragging handler
+    const handleHorizontalMouseDown = (e) => {
+        e.preventDefault();
+        const container = document.getElementById("right-container");
+        if (!container) return;
+        const rect = container.getBoundingClientRect();
+        const handleMouseMove = (moveEvent) => {
+            const relativeY = moveEvent.clientY - rect.top;
+            const percentage = (relativeY / rect.height) * 100;
+            if (percentage > 20 && percentage < 85) {
+                setEditorHeight(percentage);
+            }
+        };
+        const handleMouseUp = () => {
+            window.removeEventListener("mousemove", handleMouseMove);
+            window.removeEventListener("mouseup", handleMouseUp);
+        };
+        window.addEventListener("mousemove", handleMouseMove);
+        window.addEventListener("mouseup", handleMouseUp);
+    };
+
     useEffect(() => {
-        getProblemById(id)
-        getSubmissionCountForProblem(id)
-        clearSubmission()
-    }, [id, getProblemById, getSubmissionCountForProblem, clearSubmission])
+        getProblemById(id);
+        getSubmissionCountForProblem(id);
+        if (authUser) {
+            getSubmissionForProblem(id);
+        }
+        clearSubmission();
+    }, [id, getProblemById, getSubmissionCountForProblem, clearSubmission, authUser, getSubmissionForProblem]);
 
     useEffect(() => {
         if (problem) {
-            setCode(problem.codeSnippets?.[selectedLanguage] || "")
+            setCode(problem.codeSnippets?.[selectedLanguage] || "");
 
             setTestCases(
                 problem.testCases.map((tc) => ({
                     input: tc.input,
                     output: tc.output
                 })) || []
-            )
+            );
+            setActiveTestCaseIndex(0);
+            setActiveResultCaseIndex(0);
         }
-    }, [problem, selectedLanguage])
+    }, [problem, selectedLanguage]);
 
-    // useEffect(() => {
-    //     if (activeTab === "submissions" && id) {
-    //         getSubmissionForProblem(id)
-    //     }
-    // }, [activeTab, id, getSubmissionForProblem])
-    // console.log("Submission Tab data",submissions);
-
-    /**Vibe code */
-    // stable fetch function
-    const fetchSubmissions = useCallback(() => {
-        if (activeTab === "submissions" && id && authUser) {
-            getSubmissionForProblem(id);
-        }
-    }, [activeTab, id, getSubmissionForProblem, authUser]);
-
-    useEffect(() => {
-        fetchSubmissions();
-    }, [fetchSubmissions]);
-    /* */
+    function getInitials(name = "") {
+        return name
+            .split(" ")
+            .filter(Boolean)
+            .slice(0, 2)
+            .map(word => word[0].toUpperCase())
+            .join("");
+    }
+    const initials = authUser ? getInitials(authUser.name) : "";
 
     return problem && (
-        <div className="min-h-screen bg-gradient-to-br from-base-300 to-base-200 max-w-7xl w-full">
-            <nav className="navbar bg-base-100 shadow-lg px-4">
-                <div className="flex-1 gap-2">
-                    <Link to={"/"} className="flex items-center gap-2 text-primary">
-                        <Home className="w-6 h-6" />
-                        <ChevronRight className="w-4 h-4" />
-                    </Link>
+        <div className="h-screen w-screen bg-[#1a1a1a] text-gray-200 flex flex-col overflow-hidden select-none font-sans">
+            
+            {/* LEETCODE STYLE NAVBAR */}
+            <ProblemHeader
+                problem={problem}
+                prevProblem={prevProblem}
+                nextProblem={nextProblem}
+                handlePrevProblem={handlePrevProblem}
+                handleNextProblem={handleNextProblem}
+                handleRandomProblem={handleRandomProblem}
+                handleRunCode={handleRunCode}
+                handleSubmitCode={handleSubmitCode}
+                isExecuting={isExecuting}
+                isBookmarked={isBookmarked}
+                setIsBookmarked={setIsBookmarked}
+                authUser={authUser}
+                initials={initials}
+                setIsAuthModalOpen={setIsAuthModalOpen}
+            />
 
-                    <div className="mt-2">
-                        <h1 className="text-xl font-bold">{problem.title}</h1>
-                        <div className="flex items-center gap-2 text-sm text-base-content/70 mt-5">
-                            <Clock className="w-4 h-4" />
-                            <span>
-                                Updated{" "}
-                                {problem.createdAt &&
-                                    new Date(problem.createdAt).toLocaleString("en-US", {
-                                        year: "numeric",
-                                        month: "long",
-                                        day: "numeric",
-                                    })}
-                            </span>
-                            <span className="text-base-content/30">•</span>
-                            <Users className="w-4 h-4" />
-                            <span>{submissionCount} Submissions</span>
-                            <span className="text-base-content/30">•</span>
-                            <ThumbsUp className="w-4 h-4" />
-                            <span>95% Success Rate</span>
-                        </div>
-                    </div>
+            {/* WORKSPACE PANELS */}
+            <main className="flex-1 flex flex-row overflow-hidden w-full relative">
+                
+                {/* LEFT PANEL: Problem description / Submissions tabs */}
+                <section
+                    style={{ width: `${leftWidth}%` }}
+                    className="h-full flex flex-col overflow-hidden bg-[#1e1e1e]"
+                >
+                    <ProblemDescription
+                        problem={problem}
+                        activeTab={activeTab}
+                        setActiveTab={setActiveTab}
+                        submissionCount={submissionCount}
+                        submissions={submissions}
+                        isSubmissionLoading={isSubmissionLoading}
+                        authUser={authUser}
+                        setIsAuthModalOpen={setIsAuthModalOpen}
+                        id={id}
+                    />
+                </section>
+
+                {/* VERTICAL DRAG RESIZER */}
+                <div
+                    className="w-1 bg-[#282828] hover:bg-[#ffa116] active:bg-[#ffa116] cursor-col-resize h-full transition-colors flex-shrink-0 relative z-10"
+                    onMouseDown={handleVerticalMouseDown}
+                >
+                    <div className="absolute inset-y-0 -left-1 -right-1 cursor-col-resize"></div>
                 </div>
 
-                <div className="flex-none gap-4">
-                    <button
-                        className={`btn btn-ghost btn-circle tooltip tooltip-info  
-                            ${isBookmarked ? "text-primary" : ""} `}
-                        data-tip={isBookmarked ? "Unbookmark" : "Bookmark"}
-                        onClick={() => setIsBookmarked(!isBookmarked)}
+                {/* RIGHT PANEL: Code Editor & Console split */}
+                <section
+                    id="right-container"
+                    style={{ width: `${100 - leftWidth}%` }}
+                    className="h-full flex flex-col overflow-hidden"
+                >
+                    {/* Top half: Monaco Editor */}
+                    <div
+                        style={{ height: `${editorHeight}%` }}
+                        className="w-full flex flex-col overflow-hidden bg-[#1e1e1e]"
                     >
-                        <Bookmark className="w-5 h-5" />
-                    </button>
-                    <button className="btn btn-ghost btn-circle tooltip tooltip-top" data-tip="Share">
-                        <Share2 className="w-5 h-5" />
-                    </button>
+                        <CodeEditor
+                            selectedLanguage={selectedLanguage}
+                            handleLanguageChange={handleLanguageChange}
+                            code={code}
+                            setCode={setCode}
+                            problem={problem}
+                            handleResetCode={handleResetCode}
+                            authUser={authUser}
+                            setIsAuthModalOpen={setIsAuthModalOpen}
+                        />
+                    </div>
 
-                    <select
-                        className="select select-bordered select-primary w-40 cursor-pointer"
-                        value={selectedLanguage}
-                        onChange={handleLanguageChange}
+                    {/* HORIZONTAL DRAG RESIZER */}
+                    <div
+                        className="h-1 bg-[#282828] hover:bg-[#ffa116] active:bg-[#ffa116] cursor-row-resize w-full transition-colors flex-shrink-0 relative z-10"
+                        onMouseDown={handleHorizontalMouseDown}
                     >
-                        {Object.keys(problem.codeSnippets || {}).map((lang) => (
-                            <option key={lang} value={lang}>
-                                {lang}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-            </nav>
+                        <div className="absolute inset-x-0 -top-1 -bottom-1 cursor-row-resize"></div>
+                    </div>
 
-            <div className="container mx-auto p-4">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div className="card bg-base-100 shadow-xl">
-                        <div className="card-body p-0">
-                            <div className="tabs tabs-border">
-                                <button
-                                    className={`tab gap-2 ${activeTab === "description" ? 'tab-active' : ""}`}
-                                    onClick={() => setActiveTab("description")}
-                                ><FileText className="w-4 h-4" />
-                                    Description
-                                </button>
-                                <button
-                                    className={`tab gap-2 ${activeTab === "submissions" ? 'tab-active' : ""}`}
-                                    onClick={() => setActiveTab("submissions")}
-                                > <Code2 className="w-4 h-4" />
-                                    Submissions
-                                </button>
-                                <button
-                                    className={`tab gap-2 ${activeTab === "discussion" ? "tab-active" : ""}`}
-                                    onClick={() => setActiveTab("discussion")}
+                    {/* Bottom half: Testcase / Test Result console */}
+                    <div
+                        style={{ height: `${100 - editorHeight}%` }}
+                        className="w-full flex flex-col overflow-hidden bg-[#1e1e1e]"
+                    >
+                        <ConsolePanel
+                            consoleTab={consoleTab}
+                            setConsoleTab={setConsoleTab}
+                            testCases={testCases}
+                            setTestCases={setTestCases}
+                            activeTestCaseIndex={activeTestCaseIndex}
+                            setActiveTestCaseIndex={setActiveTestCaseIndex}
+                            activeResultCaseIndex={activeResultCaseIndex}
+                            setActiveResultCaseIndex={setActiveResultCaseIndex}
+                            isExecuting={isExecuting}
+                            submission={submission}
+                            handleAddTestCase={handleAddTestCase}
+                        />
+                    </div>
+                </section>
+            </main>
+
+            {/* AUTH gate modal */}
+            {isAuthModalOpen && (
+                <div className="modal modal-open backdrop-blur-md bg-black/60 transition-all duration-300">
+                    <div className="modal-box border border-primary/20 bg-[#1e1e1e] text-white shadow-2xl rounded-2xl max-w-md relative overflow-hidden">
+                        <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#ffa116]/10 rounded-full blur-2xl"></div>
+                        <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-primary/10 rounded-full blur-2xl"></div>
+
+                        <button
+                            className="btn btn-sm btn-circle btn-ghost absolute right-4 top-4 text-neutral-400 hover:text-white"
+                            onClick={() => setIsAuthModalOpen(false)}
+                        >
+                            ✕
+                        </button>
+                        
+                        <div className="flex flex-col items-center text-center p-4">
+                            <div className="bg-[#ffa116]/10 p-4 rounded-full mb-4 animate-bounce">
+                                <Code2 className="w-12 h-12 text-[#ffa116]" />
+                            </div>
+                            <h3 className="text-2xl font-bold text-white mb-2">Join FireCode</h3>
+                            <p className="text-neutral-400 text-sm mb-6">
+                                Sign up or log in to submit your solution, verify all test cases, track your coding stats, and join the leaderboard!
+                            </p>
+                            <div className="flex flex-col sm:flex-row gap-3 w-full justify-center">
+                                <Link
+                                    to="/login"
+                                    state={{ from: `/problem/${id}` }}
+                                    className="btn btn-primary flex-1 shadow-lg shadow-primary/20"
                                 >
-                                    <MessageSquare className="w-4 h-4" />
-                                    Discussion
-                                </button>
-                                <button
-                                    className={`tab gap-2 ${activeTab === "hints" ? "tab-active" : ""}`}
-                                    onClick={() => setActiveTab("hints")}
+                                    Log In
+                                </Link>
+                                <Link
+                                    to="/signup"
+                                    state={{ from: `/problem/${id}` }}
+                                    className="btn btn-outline btn-secondary flex-1"
                                 >
-                                    <Lightbulb className="w-4 h-4" />
-                                    Hints
-                                </button>
-                            </div>
-
-                            <div className="p-6">
-                                {renderTabContent()}
+                                    Sign Up
+                                </Link>
                             </div>
                         </div>
                     </div>
-                    <div className="card bg-base-100 shadow-xl ">
-                            <div className="flex items-center justify-between bg-base-200 p-3 rounded-xl shadow-sm">
-                                {/* Left side — Code Editor tab */}
-                                <div className="tabs tabs-bordered">
-                                    <button className="tab tab-active gap-2 font-semibold text-base-content">
-                                        <Terminal className="w-4 h-4" />
-                                        Code Editor
-                                    </button>
-                                </div>
-
-                                {/* Right side — Run + Submit buttons */}
-                                <div className="flex items-center gap-3">
-                                    <button
-                                        className="btn btn-primary gap-2"
-                                        onClick={handleRunCode}
-                                        disabled={isExecuting}
-                                    >
-                                        {isExecuting ? (
-                                            <>
-                                                <span className="loading loading-spinner loading-sm"></span>
-                                                Running...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Play className="w-4 h-4" />
-                                                Run
-                                            </>
-                                        )}
-                                    </button>
-
-                                    <button
-                                        onClick={handleSubmitCode}
-                                        disabled={isExecuting}
-                                        className="btn btn-success gap-2"
-                                    >
-                                        {isExecuting ? (
-                                            <>
-                                                <span className="loading loading-spinner loading-sm"></span>
-                                                Submitting...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Send className="w-4 h-4" />
-                                                Submit
-                                            </>
-                                        )}
-                                    </button>
-                                </div>
-                            </div>
-
-
-                            <div className="h-[600px] w-full">
-                                <Editor
-                                    height={"100%"}
-                                    language={selectedLanguage.toLowerCase()}
-                                    defaultValue={problem.codeSnippets?.["JAVASCRIPT"]}
-                                    theme="vs-dark"
-                                    value={code}
-                                    onChange={(value) => setCode(value || "")}
-                                    options={
-                                        {
-                                            minimap: { enabled: false },
-                                            fontSize: 22,
-                                            lineNumbers: "on",
-                                            roundedSelection: false,
-                                            scrollBeyondLastLine: false,
-                                            readOnly: false,
-                                            automaticLayout: true,
-
-                                        }
-                                    }
-                                />
-                            </div>
-                        </div>
                 </div>
-
-                <div className="card bg-base-100 shadow-xl mt-6">
-                    <div className="card-body">
-                        {
-                            submission ? (<SubmissionResults submission={submission} />)
-                                : <>
-                                    <div className="flex items-center justify-between mb-6">
-                                        <h3 className="text-xl font-bold">Test Cases</h3>
-                                    </div>
-                                    <div className="overflow-x-auto">
-                                        <table className="table table-zebra w-full">
-                                            <thead>
-                                                <tr>
-                                                    <th>Input</th>
-                                                    <th>Expected Output</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {testCases.map((testcase, i) => (
-                                                    <tr key={i}>
-                                                        <td className="font-mono">{testcase.input}</td>
-                                                        <td className="font-mono">{testcase.output}</td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </>
-                        }
-                    </div>
-
-                </div>
-
-                {isAuthModalOpen && (
-                    <div className="modal modal-open backdrop-blur-md bg-black/60 transition-all duration-300">
-                        <div className="modal-box border border-primary/20 bg-base-100/90 shadow-2xl rounded-2xl max-w-md relative overflow-hidden">
-                            {/* Ambient background glow */}
-                            <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/20 rounded-full blur-2xl"></div>
-                            <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-secondary/10 rounded-full blur-2xl"></div>
-
-                            <button 
-                                className="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"
-                                onClick={() => setIsAuthModalOpen(false)}
-                            >
-                                ✕
-                            </button>
-                            
-                            <div className="flex flex-col items-center text-center p-4">
-                                <div className="bg-primary/10 p-4 rounded-full mb-4 animate-bounce">
-                                    <Code2 className="w-12 h-12 text-primary" />
-                                </div>
-                                <h3 className="text-2xl font-bold text-base-content mb-2">Join FireCode</h3>
-                                <p className="text-base-content/70 mb-6">
-                                    Sign up or log in to submit your solution, verify all test cases, track your coding stats, and join the leaderboard!
-                                </p>
-                                <div className="flex flex-col sm:flex-row gap-3 w-full justify-center">
-                                    <Link 
-                                        to="/login" 
-                                        state={{ from: `/problem/${id}` }}
-                                        className="btn btn-primary flex-1 shadow-lg shadow-primary/20"
-                                    >
-                                        Log In
-                                    </Link>
-                                    <Link 
-                                        to="/signup" 
-                                        state={{ from: `/problem/${id}` }}
-                                        className="btn btn-outline btn-secondary flex-1"
-                                    >
-                                        Sign Up
-                                    </Link>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </div>
+            )}
         </div>
     );
+};
 
-}
-
-
-export default ProblemPage
+export default ProblemPage;
