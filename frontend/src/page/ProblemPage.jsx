@@ -34,7 +34,7 @@ const ProblemPage = () => {
     const [activeTestCaseIndex, setActiveTestCaseIndex] = useState(0);
     const [activeResultCaseIndex, setActiveResultCaseIndex] = useState(0);
 
-    const { executeCode, submitCode, clearSubmission, submission, isExecuting } = useExecutionStore();
+    const { executeCode, submitCode, clearSubmission, submission, isExecuting, isRunning, isSubmitting } = useExecutionStore();
     const { authUser } = useAuthStore();
 
     const { 
@@ -222,6 +222,8 @@ const ProblemPage = () => {
                 handleRandomProblem={handleRandomProblem}
                 handleRunCode={handleRunCode}
                 handleSubmitCode={handleSubmitCode}
+                isRunning={isRunning}
+                isSubmitting={isSubmitting}
                 isExecuting={isExecuting}
                 isBookmarked={isBookmarked}
                 setIsBookmarked={setIsBookmarked}

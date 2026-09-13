@@ -23,6 +23,8 @@ const ProblemHeader = ({
   handleRandomProblem,
   handleRunCode,
   handleSubmitCode,
+  isRunning,
+  isSubmitting,
   isExecuting,
   isBookmarked,
   setIsBookmarked,
@@ -30,6 +32,7 @@ const ProblemHeader = ({
   initials,
   setIsAuthModalOpen,
 }) => {
+  const isAnyExecuting = isRunning || isSubmitting || isExecuting;
   return (
     <header className="bg-[#282828] border-b border-[#3e3e3e] px-4 h-12 flex items-center justify-between flex-shrink-0 z-20 select-none">
       {/* Left controls */}
@@ -78,10 +81,10 @@ const ProblemHeader = ({
       <div className="flex items-center gap-2">
         <button
           onClick={handleRunCode}
-          disabled={isExecuting}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-[#333] hover:bg-[#444] border border-neutral-700 rounded-md text-xs font-semibold text-white transition-colors disabled:opacity-50 cursor-pointer"
+          disabled={isAnyExecuting}
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-[#333] hover:bg-[#444] border border-neutral-700 rounded-md text-xs font-semibold text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
-          {isExecuting ? (
+          {isRunning ? (
             <span className="loading loading-spinner loading-xs"></span>
           ) : (
             <Play className="w-3.5 h-3.5 text-neutral-400 fill-current" />
@@ -91,10 +94,10 @@ const ProblemHeader = ({
 
         <button
           onClick={handleSubmitCode}
-          disabled={isExecuting}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#2cbb5d] hover:bg-[#229647] rounded-md text-xs font-semibold text-white transition-colors disabled:opacity-50 cursor-pointer"
+          disabled={isAnyExecuting}
+          className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#2cbb5d] hover:bg-[#229647] rounded-md text-xs font-semibold text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
-          {isExecuting ? (
+          {isSubmitting ? (
             <span className="loading loading-spinner loading-xs"></span>
           ) : (
             <Send className="w-3.5 h-3.5" />
