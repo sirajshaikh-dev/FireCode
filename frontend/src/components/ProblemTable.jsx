@@ -10,6 +10,14 @@ import CreatePlaylistModal from "./playlists/CreatePlaylistModal";
 import AddToPlaylistModal from "./playlists/AddToPlaylistModal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table";
 
 
 const ProblemTable = () => {
@@ -171,31 +179,31 @@ const ProblemTable = () => {
         </select>
       </div>
 
-      <div className="overflow-x-auto rounded-xl shadow-md">
-        <table className="table table-zebra table-lg bg-base-200 text-base-content">
-          <thead className="bg-base-200">
-            <tr>
-              <th>Solved</th>
-              <th>Title</th>
-              <th>Tags</th>
-              <th>Difficulty</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
+      <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+        <Table>
+          <TableHeader className="bg-muted/40">
+            <TableRow>
+              <TableHead className="w-16">Solved</TableHead>
+              <TableHead>Title</TableHead>
+              <TableHead>Tags</TableHead>
+              <TableHead>Difficulty</TableHead>
+              <TableHead className="text-right sm:text-left">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
 
-          <tbody>
+          <TableBody>
             {isProblemsLoading ? (
-              <tr>
-                <td colSpan={5} className="text-center py-6">
-                  <Loader className="size-10 animate-spin mx-auto" />
-                </td>
-              </tr>
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-8">
+                  <Loader className="size-8 animate-spin mx-auto text-primary" />
+                </TableCell>
+              </TableRow>
             ) : paginatedProblems.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="text-center py-6 text-gray-500">
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                   No problems found.
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : (
               // 🔹 Render problems when available
               paginatedProblems.map((problem) => {
@@ -203,24 +211,24 @@ const ProblemTable = () => {
                   (user) => user.userId === authUser?.id
                 ) || false;
                 return (
-                  <tr key={problem.id}>
-                    <td>
+                  <TableRow key={problem.id}>
+                    <TableCell>
                       <input
                         type="checkbox"
                         checked={isSolved}
                         readOnly
-                        className="checkbox checkbox-sm"
+                        className="h-4 w-4 rounded border-border accent-primary cursor-default"
                       />
-                    </td>
-                    <td>
+                    </TableCell>
+                    <TableCell>
                       <Link
                         to={`/problem/${problem.id}`}
-                        className="font-semibold hover:underline"
+                        className="font-medium text-foreground hover:text-primary transition-colors"
                       >
                         {problem.title}
                       </Link>
-                    </td>
-                    <td>
+                    </TableCell>
+                    <TableCell>
                       <div className="flex flex-wrap gap-1">
                         {(problem.tags || []).map((tag, i) => (
                           <Badge
@@ -232,8 +240,8 @@ const ProblemTable = () => {
                           </Badge>
                         ))}
                       </div>
-                    </td>
-                    <td>
+                    </TableCell>
+                    <TableCell>
                       <Badge
                         variant={
                           problem.difficulty === "EASY"
@@ -245,8 +253,8 @@ const ProblemTable = () => {
                       >
                         {problem.difficulty}
                       </Badge>
-                    </td>
-                    <td>
+                    </TableCell>
+                    <TableCell>
                       <div className="flex flex-col md:flex-row gap-2 lg:items-center md:items-center">
                         {authUser?.role === "ADMIN" && (
                           <div className="flex gap-2">
@@ -287,13 +295,13 @@ const ProblemTable = () => {
                           </Button>
                         </div>
                       </div>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 );
               })
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
 
