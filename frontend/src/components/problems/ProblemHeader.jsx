@@ -14,6 +14,19 @@ import {
 } from "lucide-react";
 import LogoutButton from "../LogoutButton";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import {
+  Avatar,
+  AvatarImage,
+  AvatarFallback,
+} from "@/components/ui/avatar";
 
 const ProblemHeader = ({
   problem,
@@ -125,47 +138,51 @@ const ProblemHeader = ({
         <div className="w-px h-5 bg-neutral-700"></div>
 
         {authUser ? (
-          <div className="dropdown dropdown-end">
-            <label tabIndex={0} className="btn btn-ghost btn-circle avatar flex items-center justify-center w-8 h-8 min-h-8">
-              <div className="w-7 h-7 rounded-full overflow-hidden border border-neutral-700">
-                {authUser.avatar ? (
-                  <img src={authUser.avatar} alt={authUser.name} className="object-cover" />
-                ) : (
-                  <div className="h-full w-full bg-[#ffa116] text-black flex items-center justify-center font-bold text-xs">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 rounded-full ring-1 ring-neutral-700 hover:ring-primary/40 transition-all p-0"
+              >
+                <Avatar className="h-7 w-7">
+                  <AvatarImage src={authUser.avatar} alt={authUser.name} />
+                  <AvatarFallback className="bg-primary text-primary-foreground font-bold text-xs">
                     {initials}
-                  </div>
-                )}
-              </div>
-            </label>
-            <ul
-              tabIndex={0}
-              className="menu menu-sm dropdown-content mt-3 z-[100] p-2 bg-[#282828] border border-neutral-800 rounded-box w-52 shadow-xl space-y-2 text-white"
-            >
-              <li className="px-3 py-1">
-                <span className="font-semibold text-xs text-neutral-400">{authUser.name}</span>
-              </li>
-              <hr className="border-neutral-800" />
-              <li>
-                <Link to="/profile" className="hover:bg-neutral-800 py-2">
-                  <Users className="w-4 h-4 mr-2" />
-                  My Profile
+                  </AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52 p-1.5 shadow-xl border-border bg-popover">
+              <DropdownMenuLabel className="font-semibold text-xs text-muted-foreground px-2 py-1.5">
+                {authUser.name}
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link to="/profile" className="flex items-center gap-2 cursor-pointer text-sm py-2">
+                  <Users className="w-4 h-4 text-muted-foreground" />
+                  <span>My Profile</span>
                 </Link>
-              </li>
+              </DropdownMenuItem>
               {authUser?.role === "ADMIN" && (
-                <li>
-                  <Link to="/add-problem" className="hover:bg-neutral-800 py-2">
-                    <Code2 className="w-4 h-4 mr-2" />
-                    Add Problem
+                <DropdownMenuItem asChild>
+                  <Link to="/add-problem" className="flex items-center gap-2 cursor-pointer text-sm py-2">
+                    <Code2 className="w-4 h-4 text-muted-foreground" />
+                    <span>Add Problem</span>
                   </Link>
-                </li>
+                </DropdownMenuItem>
               )}
-              <li>
-                <LogoutButton className="hover:bg-neutral-800 py-2 text-red-400 w-full text-left">
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <LogoutButton
+                  variant="ghost"
+                  className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 text-sm px-2 py-2 h-auto"
+                >
                   Logout
                 </LogoutButton>
-              </li>
-            </ul>
-          </div>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         ) : (
           <div className="flex items-center gap-3">
             <button

@@ -4,12 +4,22 @@ import { useAuthStore } from "../store/useAuthStore";
 import { Link } from "react-router-dom";
 import LogoutButton from "./LogoutButton";
 import { Button } from "@/components/ui/button";
-
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import {
+  Avatar,
+  AvatarImage,
+  AvatarFallback,
+} from "@/components/ui/avatar";
 
 const Navbar = () => {
-
-  const { authUser } = useAuthStore()
-  // console.log("AUTH_USER", authUser)
+  const { authUser } = useAuthStore();
 
   function getInitials(name = "") {
     return name
@@ -20,7 +30,6 @@ const Navbar = () => {
       .join("");
   }
   const initials = getInitials(authUser?.name);
-  const hasImage = Boolean(authUser?.avatar);
 
   return (
     <nav className="sticky top-0 z-50 w-full py-5">
@@ -28,7 +37,7 @@ const Navbar = () => {
         {/* Logo Section */}
         <Link to="/" className="flex items-center gap-3 cursor-pointer">
           <img src="/firecode.svg" alt="Firecode Logo" className="h-10 w-10" />
-          <span className="text-lg md:text-2xl font-bold tracking-tight md:block ">
+          <span className="text-lg md:text-2xl font-bold tracking-tight md:block">
             Firecode
           </span>
         </Link>
@@ -36,65 +45,61 @@ const Navbar = () => {
         {/* User Profile and Dropdown / Auth Buttons */}
         <div className="flex items-center gap-4">
           {authUser ? (
-            <div className="dropdown dropdown-end">
-              <label tabIndex={0} className="btn btn-ghost btn-circle avatar flex flex-row ">
-                <div className="w-10 rounded-full ">
-                  {hasImage ? (
-                    <img
-                      src={authUser.avatar}
-                      alt={authUser.name} className="object-cover"
-                      loading="lazy"
-                    />) : (
-                    <div className="h-10 w-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-md select-none">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-10 w-10 rounded-full ring-2 ring-primary/20 hover:ring-primary/40 transition-all p-0"
+                >
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={authUser.avatar} alt={authUser.name} />
+                    <AvatarFallback className="bg-primary text-primary-foreground font-bold text-sm">
                       {initials}
-                    </div>
-                  )}
-                </div>
-
-              </label>
-              <ul
-                tabIndex={0}
-                className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52 space-y-3"
-              >
-
-                {/* Common Options */}
-                <li>
-                  <p className="text-base font-semibold">
-                    {authUser?.name}
-                  </p>
-                  <hr className="border-gray-200/10" />
-                </li>
-                <li>
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 p-1.5 shadow-xl border-border bg-popover">
+                <DropdownMenuLabel className="font-semibold text-sm px-2 py-1.5 text-foreground">
+                  {authUser?.name}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
                   <Link
                     to="/profile"
-                    className="hover:bg-primary hover:text-white text-base font-semibold"
+                    className="flex items-center gap-2 cursor-pointer font-medium text-sm py-2"
                   >
-                    <User className="w-4 h-4 mr-2" />
-                    My Profile
+                    <User className="w-4 h-4 text-muted-foreground" />
+                    <span>My Profile</span>
                   </Link>
-                </li>
+                </DropdownMenuItem>
 
                 {/* Admin Option */}
-
                 {authUser?.role === "ADMIN" && (
-                  <li>
+                  <DropdownMenuItem asChild>
                     <Link
                       to="/add-problem"
-                      className="hover:bg-primary hover:text-white text-base font-semibold"
+                      className="flex items-center gap-2 cursor-pointer font-medium text-sm py-2"
                     >
-                      <Code className="w-4 h-4 mr-1" />
-                      Add Problem
+                      <Code className="w-4 h-4 text-muted-foreground" />
+                      <span>Add Problem</span>
                     </Link>
-                  </li>
+                  </DropdownMenuItem>
                 )}
-                <li>
-                  <LogoutButton className="hover:bg-primary hover:text-white">
+
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <LogoutButton
+                    variant="ghost"
+                    className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 font-medium text-sm px-2 py-2 h-auto"
+                  >
                     <LogOut className="w-4 h-4 mr-2" />
-                    Logout
+                    <span>Logout</span>
                   </LogoutButton>
-                </li>
-              </ul>
-            </div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <div className="flex items-center gap-3">
               <Button variant="ghost" asChild className="text-sm md:text-base font-semibold">
@@ -108,6 +113,7 @@ const Navbar = () => {
         </div>
       </div>
     </nav>
-  )
-}
+  );
+};
+
 export default Navbar;
