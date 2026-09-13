@@ -13,6 +13,7 @@ import {
   Code2,
 } from "lucide-react";
 import LogoutButton from "../LogoutButton";
+import { Button } from "@/components/ui/button";
 
 const ProblemHeader = ({
   problem,
@@ -108,12 +109,14 @@ const ProblemHeader = ({
 
       {/* Right controls */}
       <div className="flex items-center gap-4">
-        <button
-          className={`btn btn-ghost btn-xs btn-circle ${isBookmarked ? "text-[#ffa116]" : "text-neutral-400 hover:text-white"}`}
+        <Button
+          variant="ghost"
+          size="icon"
+          className={`h-7 w-7 rounded-full p-0 ${isBookmarked ? "text-primary hover:text-primary" : "text-neutral-400 hover:text-white"}`}
           onClick={() => setIsBookmarked(!isBookmarked)}
         >
           <Bookmark className={`w-4 h-4 ${isBookmarked ? "fill-current" : ""}`} />
-        </button>
+        </Button>
         
         <button className="text-neutral-400 hover:text-white hover:bg-neutral-800 p-1 rounded transition-colors">
           <Share2 className="w-4 h-4" />

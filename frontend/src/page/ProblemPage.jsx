@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { Code2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 import { useProblemStore } from "../store/useProblemStore";
 import { useExecutionStore } from "../store/useExecutionStore";
@@ -321,36 +322,47 @@ const ProblemPage = () => {
                         <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#ffa116]/10 rounded-full blur-2xl"></div>
                         <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-primary/10 rounded-full blur-2xl"></div>
 
-                        <button
-                            className="btn btn-sm btn-circle btn-ghost absolute right-4 top-4 text-neutral-400 hover:text-white"
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 rounded-full absolute right-4 top-4 text-neutral-400 hover:text-white"
                             onClick={() => setIsAuthModalOpen(false)}
                         >
                             ✕
-                        </button>
+                        </Button>
                         
                         <div className="flex flex-col items-center text-center p-4">
-                            <div className="bg-[#ffa116]/10 p-4 rounded-full mb-4 animate-bounce">
-                                <Code2 className="w-12 h-12 text-[#ffa116]" />
+                            <div className="bg-primary/10 p-4 rounded-full mb-4 animate-bounce">
+                                <Code2 className="w-12 h-12 text-primary" />
                             </div>
                             <h3 className="text-2xl font-bold text-white mb-2">Join FireCode</h3>
                             <p className="text-neutral-400 text-sm mb-6">
                                 Sign up or log in to submit your solution, verify all test cases, track your coding stats, and join the leaderboard!
                             </p>
                             <div className="flex flex-col sm:flex-row gap-3 w-full justify-center">
-                                <Link
-                                    to="/login"
-                                    state={{ from: `/problem/${id}` }}
-                                    className="btn btn-primary flex-1 shadow-lg shadow-primary/20"
+                                <Button
+                                    asChild
+                                    className="flex-1 shadow-lg shadow-primary/20"
                                 >
-                                    Log In
-                                </Link>
-                                <Link
-                                    to="/signup"
-                                    state={{ from: `/problem/${id}` }}
-                                    className="btn btn-outline btn-secondary flex-1"
+                                    <Link
+                                        to="/login"
+                                        state={{ from: `/problem/${id}` }}
+                                    >
+                                        Log In
+                                    </Link>
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    asChild
+                                    className="flex-1"
                                 >
-                                    Sign Up
-                                </Link>
+                                    <Link
+                                        to="/signup"
+                                        state={{ from: `/problem/${id}` }}
+                                    >
+                                        Sign Up
+                                    </Link>
+                                </Button>
                             </div>
                         </div>
                     </div>

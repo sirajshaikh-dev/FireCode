@@ -3,6 +3,7 @@ import { X, Plus, Loader } from 'lucide-react'
 import { usePlaylistStore } from '../../store/usePlaylistStore'
 import { useAuthStore } from '../../store/useAuthStore'
 import CreatePlaylistModal from './CreatePlaylistModal'
+import { Button } from '@/components/ui/button'
 
 
 const AddToPlaylistModal = ({ ModalRef, closeModal, problemId }) => {
@@ -67,10 +68,19 @@ const AddToPlaylistModal = ({ ModalRef, closeModal, problemId }) => {
     <>
       <dialog ref={ModalRef} className="modal">
         <div className="modal-box w-full max-w-md p-6 space-y-6">
-          <h3>Select a playlist to add this problem to:</h3>
-          <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" aria-label="Close">
-            <X className="w-4 h-4" onClick={closeModal} />
-          </button>
+          <div className="flex justify-between items-center">
+            <h3 className="text-base font-semibold">Select a playlist to add this problem to:</h3>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-full"
+              onClick={closeModal}
+              aria-label="Close"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
 
           <form onSubmit={handleFormSubmit} className="space-y-4">
             <div>
@@ -92,20 +102,24 @@ const AddToPlaylistModal = ({ ModalRef, closeModal, problemId }) => {
 
             </div>
             <div className="flex justify-end gap-2 mt-6">
-              <button type="button" onClick={openCreatePlaylistModal} className="btn btn-outline btn-success">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={openCreatePlaylistModal}
+                className="text-emerald-500 border-emerald-500/40 hover:bg-emerald-500/10"
+              >
                 <Plus className="w-4 h-4" /> Create Playlist
-              </button>
-              <button type="button" onClick={closeModal} className="btn btn-ghost">
+              </Button>
+              <Button type="button" variant="ghost" onClick={closeModal}>
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
-                className="btn btn-primary"
                 disabled={!selectedPlaylist || isPlaylistLoading}
               >
                 {isPlaylistLoading ? <Loader className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                 Add to Playlist
-              </button>
+              </Button>
             </div>
           </form>
 

@@ -13,6 +13,8 @@ import {
     Lock,
     Mail
 } from 'lucide-react'
+import { Button } from "@/components/ui/button";
+
 
 
 const LoginSchema = z.object({
@@ -115,20 +117,20 @@ const LoginForm = () => {
                     </div>
 
                     {/* Submit Button */}
-                    <button
+                    <Button
                         type="submit"
-                        className="btn btn-primary w-full"
+                        className="w-full"
                         disabled={isLoggingIn}
                     >
                         {isLoggingIn ? (
                             <>
-                                <Loader2 className="h-5 w-5 animate-spin" />
+                                <Loader2 className="h-4 w-4 animate-spin" />
                                 Loading...
                             </>
                         ) : (
                             "Sign in"
                         )}
-                    </button>
+                    </Button>
                 </form>
 
                 {/* Footer */}

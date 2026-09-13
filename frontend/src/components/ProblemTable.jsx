@@ -8,6 +8,7 @@ import { useProblemStore } from "../store/useProblemStore";
 import { usePlaylistStore } from "../store/usePlaylistStore";
 import CreatePlaylistModal from "./playlists/CreatePlaylistModal";
 import AddToPlaylistModal from "./playlists/AddToPlaylistModal";
+import { Button } from "@/components/ui/button";
 
 
 const ProblemTable = () => {
@@ -116,13 +117,13 @@ const ProblemTable = () => {
     <div className="w-full max-w-6xl mx-auto mt-10">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Problems</h2>
-        <button
-          className="btn btn-primary gap-2"
+        <Button
           onClick={openModal}
+          className="gap-2 shadow-sm"
         >
           <Plus className="w-4 h-4" />
           Create Playlist
-        </button>
+        </Button>
       </div>
 
       <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
@@ -247,32 +248,40 @@ const ProblemTable = () => {
                         {authUser?.role === "ADMIN" && (
                           <div className="flex gap-2">
                             <div className="tooltip" data-tip="Delete">
-                              <button
+                              <Button
+                                variant="destructive"
+                                size="sm"
                                 onClick={() => handleDelete(problem.id)}
                                 disabled={isDeletingProblem}
-                                className="btn btn-sm btn-error"
+                                className="h-8 w-8 p-0"
                               >
                                 {isDeletingProblem ? (
                                   <Loader2 className="animate-spin h-4 w-4" />
                                 ) : (
                                   <TrashIcon className="w-4 h-4 text-white" />
                                 )}
-                              </button>
+                              </Button>
                             </div>
                             <div className="tooltip" data-tip="Edit">
-                              <button className="tooltip-top btn btn-sm btn-warning" data-tip="Edit">
-                                <PencilIcon className="w-4 h-4 text-white" />
-                              </button>
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                className="h-8 w-8 p-0 bg-amber-500/15 text-amber-400 hover:bg-amber-500/25 border border-amber-500/30"
+                              >
+                                <PencilIcon className="w-4 h-4" />
+                              </Button>
                             </div>
                           </div>
                         )}
                         <div className="tooltip tooltip-top" data-tip="Add To Playlist">
-                          <button
-                            className="btn btn-circle btn-info btn-outline"
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 rounded-full text-sky-400 border-sky-400/40 hover:bg-sky-400/10"
                             onClick={() => handleAddToPlaylist(problem.id)}
                           >
                             <Bookmark className="w-4 h-4" />
-                          </button>
+                          </Button>
                         </div>
                       </div>
                     </td>
@@ -286,20 +295,26 @@ const ProblemTable = () => {
 
 
       {/* Pagination */}
-      <div className="flex justify-center items-center mt-6 gap-2" >
-
-        <MoveLeftIcon
-          className="btn btn-sm btn-ghost cursor-pointer "
+      <div className="flex justify-center items-center mt-6 gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
           disabled={currentPage === 1}
-          onClick={() => setCurrentPage((prev) => prev - 1)} />
-        <span className="btn btn-ghost btn-sm">
-          {currentPage}/{totalPages}
+          onClick={() => setCurrentPage((prev) => prev - 1)}
+        >
+          <MoveLeftIcon className="w-4 h-4" />
+        </Button>
+        <span className="text-xs font-semibold px-3 py-1.5 rounded-md bg-muted text-muted-foreground">
+          {currentPage} / {totalPages}
         </span>
-        <MoveRightIcon
-          className="btn btn-sm btn-ghost cursor-pointer "
+        <Button
+          variant="ghost"
+          size="sm"
           disabled={currentPage === totalPages}
           onClick={() => setCurrentPage((prev) => prev + 1)}
-        />
+        >
+          <MoveRightIcon className="w-4 h-4" />
+        </Button>
       </div>
 
       {/* Modal */}

@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { usesubmissionStore } from "../store/useSubmissionStore";
 import { useParams } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const SubmissionsList = memo(({ submissions, isSubmissionLoading }) => {
   const { id: problemId } = useParams();
@@ -100,13 +101,15 @@ const SubmissionsList = memo(({ submissions, isSubmissionLoading }) => {
     return (
       <div className="text-center p-8 select-none">
         <div className="text-neutral-500 text-sm mb-2">No submissions yet</div>
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={handleRefresh}
-          className="btn btn-ghost btn-xs text-neutral-400 hover:text-white gap-1"
+          className="h-7 text-xs text-neutral-400 hover:text-white gap-1"
         >
           <RotateCw className="w-3 h-3" />
           Refresh
-        </button>
+        </Button>
       </div>
     );
   }

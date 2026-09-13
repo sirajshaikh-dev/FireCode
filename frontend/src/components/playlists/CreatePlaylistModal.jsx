@@ -2,6 +2,7 @@ import { X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { usePlaylistStore } from "../../store/usePlaylistStore";
+import { Button } from "@/components/ui/button";
 
 const CreatePlaylistModal = ({ ModalRef, closeModal, onSubmit }) => {
   const {isPlaylistLoading} = usePlaylistStore();
@@ -26,14 +27,16 @@ const CreatePlaylistModal = ({ ModalRef, closeModal, onSubmit }) => {
         {/* Header */}
         <div className="flex justify-between items-center">
           <h3 className="text-xl font-semibold">Create New Playlist</h3>
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
             onClick={closeModal}
-            className="btn btn-sm btn-circle btn-ghost"
+            className="h-8 w-8 rounded-full"
             aria-label="Close"
           >
             <X className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
 
         {/* Form */}
@@ -75,16 +78,16 @@ const CreatePlaylistModal = ({ ModalRef, closeModal, onSubmit }) => {
 
           {/* Actions */}
           <div className="flex justify-end gap-3 pt-4 border-t">
-            <button
+            <Button
               type="button"
+              variant="ghost"
               onClick={closeModal}
-              className="btn btn-ghost"
             >
               Cancel
-            </button>
-            <button type="submit" className="btn btn-primary">
+            </Button>
+            <Button type="submit">
               {isPlaylistLoading ? "Creating..." : "Create Playlist"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

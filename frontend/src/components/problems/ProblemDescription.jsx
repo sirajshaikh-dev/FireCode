@@ -1,6 +1,7 @@
 import React from "react";
 import { FileText, Code2, MessageSquare, Lightbulb, Users } from "lucide-react";
 import SubmissionsList from "../SubmissionsList";
+import { Button } from "@/components/ui/button";
 
 const ProblemDescription = ({
   problem,
@@ -89,9 +90,9 @@ const ProblemDescription = ({
             <div className="p-8 text-center text-neutral-500 flex flex-col items-center gap-3">
               <Users className="w-12 h-12 text-neutral-700" />
               <p className="text-sm">Please sign in to view your submission history.</p>
-              <button onClick={() => setIsAuthModalOpen(true)} className="btn btn-primary btn-sm mt-2">
+              <Button size="sm" onClick={() => setIsAuthModalOpen(true)} className="mt-2">
                 Sign In
-              </button>
+              </Button>
             </div>
           );
         }

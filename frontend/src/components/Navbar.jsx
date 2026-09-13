@@ -2,9 +2,8 @@ import React from "react"
 import { User, Code, LogOut } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import { Link } from "react-router-dom";
-
 import LogoutButton from "./LogoutButton";
-
+import { Button } from "@/components/ui/button";
 
 
 const Navbar = () => {
@@ -98,18 +97,12 @@ const Navbar = () => {
             </div>
           ) : (
             <div className="flex items-center gap-3">
-              <Link
-                to="/login"
-                className="btn btn-ghost text-base font-semibold hover:bg-base-200"
-              >
-                Log In
-              </Link>
-              <Link
-                to="/signup"
-                className="btn btn-primary text-base font-semibold shadow-md shadow-primary/20"
-              >
-                Sign Up
-              </Link>
+              <Button variant="ghost" asChild className="text-sm md:text-base font-semibold">
+                <Link to="/login">Log In</Link>
+              </Button>
+              <Button asChild className="text-sm md:text-base font-semibold shadow-md shadow-primary/20">
+                <Link to="/signup">Sign Up</Link>
+              </Button>
             </div>
           )}
         </div>
