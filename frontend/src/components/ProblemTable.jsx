@@ -9,6 +9,7 @@ import { usePlaylistStore } from "../store/usePlaylistStore";
 import CreatePlaylistModal from "./playlists/CreatePlaylistModal";
 import AddToPlaylistModal from "./playlists/AddToPlaylistModal";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 
 const ProblemTable = () => {
@@ -222,26 +223,28 @@ const ProblemTable = () => {
                     <td>
                       <div className="flex flex-wrap gap-1">
                         {(problem.tags || []).map((tag, i) => (
-                          <span
+                          <Badge
                             key={i}
-                            className="badge badge-outline badge-warning text-xs font-bold"
+                            variant="tag"
+                            className="text-[11px] font-medium"
                           >
                             {tag}
-                          </span>
+                          </Badge>
                         ))}
                       </div>
                     </td>
                     <td>
-                      <span
-                        className={`badge font-semibold text-xs text-white ${problem.difficulty === "EASY"
-                            ? "badge-success"
+                      <Badge
+                        variant={
+                          problem.difficulty === "EASY"
+                            ? "easy"
                             : problem.difficulty === "MEDIUM"
-                              ? "badge-warning"
-                              : "badge-error"
-                          }`}
+                              ? "medium"
+                              : "hard"
+                        }
                       >
                         {problem.difficulty}
-                      </span>
+                      </Badge>
                     </td>
                     <td>
                       <div className="flex flex-col md:flex-row gap-2 lg:items-center md:items-center">

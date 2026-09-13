@@ -2,6 +2,7 @@ import React from "react";
 import { FileText, Code2, MessageSquare, Lightbulb, Users } from "lucide-react";
 import SubmissionsList from "../SubmissionsList";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 const ProblemDescription = ({
   problem,
@@ -20,19 +21,22 @@ const ProblemDescription = ({
         return (
           <div className="prose max-w-none text-neutral-300 select-text">
             <div className="flex items-center gap-2 mb-4 mt-2">
-              <span className={`px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wider ${
-                problem.difficulty === "EASY"
-                  ? "bg-[#2cbb5d]/10 text-[#2cbb5d]"
-                  : problem.difficulty === "MEDIUM"
-                  ? "bg-[#feb800]/10 text-[#feb800]"
-                  : "bg-[#ef4743]/10 text-[#ef4743]"
-              }`}>
+              <Badge
+                variant={
+                  problem.difficulty === "EASY"
+                    ? "easy"
+                    : problem.difficulty === "MEDIUM"
+                      ? "medium"
+                      : "hard"
+                }
+                className="uppercase tracking-wider"
+              >
                 {problem.difficulty}
-              </span>
+              </Badge>
               {problem.tags && problem.tags.map((tag, i) => (
-                <span key={i} className="bg-[#2c2c2c] text-neutral-400 px-2.5 py-0.5 rounded text-xs font-semibold border border-neutral-800">
+                <Badge key={i} variant="tag">
                   {tag}
-                </span>
+                </Badge>
               ))}
             </div>
 
