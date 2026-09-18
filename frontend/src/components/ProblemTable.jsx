@@ -18,6 +18,14 @@ import {
   TableHead,
   TableCell,
 } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 
 const ProblemTable = () => {
@@ -135,48 +143,49 @@ const ProblemTable = () => {
         </Button>
       </div>
 
-      <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
-        <input type="text"
-          placeholder="Search By Title"
-          className="input input-bordered w-full md:w-1/3 bg-base-200"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <div className="w-full md:w-1/3">
+          <Input
+            type="text"
+            placeholder="Search By Title"
+            className="w-full bg-muted/40 focus-visible:ring-0 focus-visible:ring-offset-0"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
 
-        <select
-          className="select select-bordered bg-base-200"
-          value={difficulty}
-          onChange={(e) => { setDifficulty(e.target.value) }}
-        >
-          <option value={"ALL"}> All Difficulties</option>
-          {difficulties.map((diff) => (
-            <option key={diff} value={diff}>
-              {diff.charAt(0).toUpperCase() + diff.slice(1).toLowerCase()}
-            </option>
-          ))}
-        </select>
+        <div className="flex flex-wrap items-center gap-4 w-full md:w-auto md:justify-end">
+          <Select value={difficulty} onValueChange={(val) => setDifficulty(val)}>
+            <SelectTrigger className="w-40 bg-muted/40 focus:ring-0 focus:ring-offset-0">
+              <SelectValue placeholder="All Difficulties" />
+            </SelectTrigger>
+            <SelectContent side="bottom" className="max-h-64">
+              <SelectItem value="ALL">All Difficulties</SelectItem>
+              {difficulties.map((diff) => (
+                <SelectItem key={diff} value={diff}>
+                  {diff.charAt(0).toUpperCase() + diff.slice(1).toLowerCase()}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-        <select
-          className="select select-bordered bg-base-200"
-          value={selectedTag}
-          onChange={(e) => { setSelectedTag(e.target.value) }}
-        >
-          <option value={"ALL"}>All Tags</option>
-          {
-            allTags.map((tag) => (
-              <option key={tag} value={tag}>
-                {/* {tag.charAt(0).toUpperCase() + tag.slice(1).toLowerCase()} */}
-                {
-                  tag
+          <Select value={selectedTag} onValueChange={(val) => setSelectedTag(val)}>
+            <SelectTrigger className="w-48 bg-muted/40 focus:ring-0 focus:ring-offset-0">
+              <SelectValue placeholder="All Tags" />
+            </SelectTrigger>
+            <SelectContent side="bottom" className="max-h-64">
+              <SelectItem value="ALL">All Tags</SelectItem>
+              {allTags.map((tag) => (
+                <SelectItem key={tag} value={tag}>
+                  {tag
                     .split(" ")
                     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(" ")
-
-                }
-              </option>
-            ))
-          }
-        </select>
+                    .join(" ")}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">

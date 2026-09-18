@@ -11,6 +11,7 @@ import {
   Home,
   Users,
   Code2,
+  Loader2,
 } from "lucide-react";
 import LogoutButton from "../LogoutButton";
 import { Button } from "@/components/ui/button";
@@ -99,7 +100,7 @@ const ProblemHeader = ({
           className="flex items-center gap-1.5 px-3 py-1.5 bg-[#333] hover:bg-[#444] border border-neutral-700 rounded-md text-xs font-semibold text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           {isRunning ? (
-            <span className="loading loading-spinner loading-xs"></span>
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
           ) : (
             <Play className="w-3.5 h-3.5 text-neutral-400 fill-current" />
           )}
@@ -112,7 +113,7 @@ const ProblemHeader = ({
           className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#2cbb5d] hover:bg-[#229647] rounded-md text-xs font-semibold text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           {isSubmitting ? (
-            <span className="loading loading-spinner loading-xs"></span>
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
           ) : (
             <Send className="w-3.5 h-3.5" />
           )}

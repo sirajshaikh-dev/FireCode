@@ -14,6 +14,8 @@ import {
   Mail
 } from 'lucide-react'
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 
 
@@ -55,71 +57,65 @@ const SignupForm = () => {
               <Code className="w-6 h-6 text-primary" />
             </div>
             <h1 className="text-2xl font-bold mt-2">Welcome </h1>
-            <p className="text-base-content/60">Sign Up to your account</p>
+            <p className="text-muted-foreground">Sign Up to your account</p>
           </div>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 
-          {/* name */}
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text font-medium">Name</span>
-            </label>
+          {/* Name */}
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Code className="h-5 w-5 text-base-content/40" />
+                <Code className="h-5 w-5 text-muted-foreground" />
               </div>
-              <input
+              <Input
+                id="name"
                 type="text"
                 {...register("name")}
-                className={`input input-bordered w-full  ${errors.name ? "input-error" : ""
-                  }`}
+                className={`pl-10 ${errors.name ? "border-destructive focus-visible:ring-destructive" : ""}`}
                 placeholder="Shaikh Siraj"
               />
             </div>
             {errors.name && (
-              <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+              <p className="text-destructive text-sm">{errors.name.message}</p>
             )}
           </div>
 
           {/* Email */}
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text font-medium">Email</span>
-            </label>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Mail className="h-5 w-5 text-base-content/40" />
+                <Mail className="h-5 w-5 text-muted-foreground" />
               </div>
-              <input
+              <Input
+                id="email"
                 type="email"
                 {...register("email")}
-                className={`input input-bordered w-full ${errors.email ? "input-error" : ""
-                  }`}
+                className={`pl-10 ${errors.email ? "border-destructive focus-visible:ring-destructive" : ""}`}
                 placeholder="you@example.com"
               />
             </div>
             {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+              <p className="text-destructive text-sm">{errors.email.message}</p>
             )}
           </div>
 
           {/* Password */}
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text font-medium">Password</span>
-            </label>
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-base-content/40" />
+                <Lock className="h-5 w-5 text-muted-foreground" />
               </div>
-              <input
+              <Input
+                id="password"
                 type={showPassword ? "text" : "password"}
                 {...register("password")}
-                className={`input input-bordered w-full ${errors.password ? "input-error" : ""
-                  }`}
+                className={`pl-10 ${errors.password ? "border-destructive focus-visible:ring-destructive" : ""}`}
                 placeholder="••••••••"
               />
               <button
@@ -128,14 +124,14 @@ const SignupForm = () => {
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
-                  <EyeOff className="h-5 w-5 text-base-content/40" />
+                  <EyeOff className="h-5 w-5 text-muted-foreground" />
                 ) : (
-                  <Eye className="h-5 w-5 text-base-content/40" />
+                  <Eye className="h-5 w-5 text-muted-foreground" />
                 )}
               </button>
             </div>
             {errors.password && (
-              <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+              <p className="text-destructive text-sm">{errors.password.message}</p>
             )}
           </div>
 
@@ -158,9 +154,9 @@ const SignupForm = () => {
 
         {/* Footer */}
         <div className="text-center">
-          <p className="text-base-content/60">
+          <p className="text-muted-foreground">
             Already have an account?{" "}
-            <Link to="/login" className="link link-primary">
+            <Link to="/login" className="text-primary hover:underline font-medium">
               Sign in
             </Link>
           </p>

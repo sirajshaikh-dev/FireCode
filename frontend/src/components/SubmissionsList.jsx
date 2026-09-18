@@ -3,6 +3,7 @@ import {
   ChevronDown,
   ChevronUp,
   RotateCw,
+  Loader2,
 } from "lucide-react";
 import { usesubmissionStore } from "../store/useSubmissionStore";
 import { useParams } from "react-router-dom";
@@ -91,8 +92,8 @@ const SubmissionsList = memo(({ submissions, isSubmissionLoading }) => {
   // Loading state
   if (isSubmissionLoading) {
     return (
-      <div className="flex justify-center items-center p-8">
-        <span className="loading loading-spinner loading-lg text-primary"></span>
+      <div className="flex justify-center items-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
