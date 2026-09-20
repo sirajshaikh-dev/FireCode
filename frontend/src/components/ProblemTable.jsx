@@ -1,13 +1,31 @@
 //ProblemTable.jsx
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Bookmark, PencilIcon, TrashIcon, Plus, OptionIcon, MoveLeftIcon, MoveRightIcon, Loader, Loader2 } from "lucide-react";
+import { Bookmark, PencilIcon, TrashIcon, Plus, OptionIcon, MoveLeftIcon, MoveRightIcon, Loader, Loader2, RotateCw } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuthStore } from "../store/useAuthStore";
 import { useProblemStore } from "../store/useProblemStore";
 import { usePlaylistStore } from "../store/usePlaylistStore";
 import CreatePlaylistModal from "./playlists/CreatePlaylistModal";
 import AddToPlaylistModal from "./playlists/AddToPlaylistModal";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 
 const ProblemTable = () => {
@@ -116,84 +134,91 @@ const ProblemTable = () => {
     <div className="w-full max-w-6xl mx-auto mt-10">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Problems</h2>
-        <button
-          className="btn btn-primary gap-2"
+        <Button
           onClick={openModal}
+          className="gap-2 shadow-sm"
         >
           <Plus className="w-4 h-4" />
           Create Playlist
-        </button>
+        </Button>
       </div>
 
-      <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
-        <input type="text"
-          placeholder="Search By Title"
-          className="input input-bordered w-full md:w-1/3 bg-base-200"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <div className="w-full md:w-1/3">
+          <Input
+            type="text"
+            placeholder="Search By Title"
+            className="w-full bg-muted/40"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
 
-        <select
-          className="select select-bordered bg-base-200"
-          value={difficulty}
-          onChange={(e) => { setDifficulty(e.target.value) }}
-        >
-          <option value={"ALL"}> All Difficulties</option>
-          {difficulties.map((diff) => (
-            <option key={diff} value={diff}>
-              {diff.charAt(0).toUpperCase() + diff.slice(1).toLowerCase()}
-            </option>
-          ))}
-        </select>
+        <div className="flex flex-wrap items-center gap-4 w-full md:w-auto md:justify-end">
+          <Select value={difficulty} onValueChange={(val) => setDifficulty(val)}>
+            <SelectTrigger className="w-40 bg-muted/40">
+              <SelectValue placeholder="All Difficulties" />
+            </SelectTrigger>
+            <SelectContent side="bottom" className="max-h-64">
+              <SelectItem value="ALL">All Difficulties</SelectItem>
+              {difficulties.map((diff) => (
+                <SelectItem key={diff} value={diff}>
+                  {diff.charAt(0).toUpperCase() + diff.slice(1).toLowerCase()}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-        <select
-          className="select select-bordered bg-base-200"
-          value={selectedTag}
-          onChange={(e) => { setSelectedTag(e.target.value) }}
-        >
-          <option value={"ALL"}>All Tags</option>
-          {
-            allTags.map((tag) => (
-              <option key={tag} value={tag}>
-                {/* {tag.charAt(0).toUpperCase() + tag.slice(1).toLowerCase()} */}
-                {
-                  tag
+          <Select value={selectedTag} onValueChange={(val) => setSelectedTag(val)}>
+            <SelectTrigger className="w-48 bg-muted/40">
+              <SelectValue placeholder="All Tags" />
+            </SelectTrigger>
+            <SelectContent side="bottom" className="max-h-64">
+              <SelectItem value="ALL">All Tags</SelectItem>
+              {allTags.map((tag) => (
+                <SelectItem key={tag} value={tag}>
+                  {tag
                     .split(" ")
                     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(" ")
-
-                }
-              </option>
-            ))
-          }
-        </select>
+                    .join(" ")}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
-      <div className="overflow-x-auto rounded-xl shadow-md">
-        <table className="table table-zebra table-lg bg-base-200 text-base-content">
-          <thead className="bg-base-200">
-            <tr>
-              <th>Solved</th>
-              <th>Title</th>
-              <th>Tags</th>
-              <th>Difficulty</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
+      <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+        <Table>
+          <TableHeader className="bg-muted/40">
+            <TableRow>
+              <TableHead className="w-16">Solved</TableHead>
+              <TableHead>Title</TableHead>
+              <TableHead>Tags</TableHead>
+              <TableHead>Difficulty</TableHead>
+              <TableHead className="text-right sm:text-left">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
 
-          <tbody>
+          <TableBody>
             {isProblemsLoading ? (
-              <tr>
-                <td colSpan={5} className="text-center py-6">
-                  <Loader className="size-10 animate-spin mx-auto" />
-                </td>
-              </tr>
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-8">
+                  <Loader className="size-8 animate-spin mx-auto text-primary" />
+                </TableCell>
+              </TableRow>
             ) : paginatedProblems.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="text-center py-6 text-gray-500">
-                  No problems found.
-                </td>
-              </tr>
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-12 text-muted-foreground">
+                  <div className="flex flex-col items-center justify-center space-y-3">
+                    <p>No problems found.</p>
+                    <Button variant="outline" size="sm" onClick={() => getAllProblems()}>
+                      <RotateCw className="w-4 h-4 mr-2" />
+                      Try Again
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
             ) : (
               // 🔹 Render problems when available
               paginatedProblems.map((problem) => {
@@ -201,105 +226,121 @@ const ProblemTable = () => {
                   (user) => user.userId === authUser?.id
                 ) || false;
                 return (
-                  <tr key={problem.id}>
-                    <td>
+                  <TableRow key={problem.id}>
+                    <TableCell>
                       <input
                         type="checkbox"
                         checked={isSolved}
                         readOnly
-                        className="checkbox checkbox-sm"
+                        className="h-4 w-4 rounded border-border accent-primary cursor-default"
                       />
-                    </td>
-                    <td>
+                    </TableCell>
+                    <TableCell>
                       <Link
                         to={`/problem/${problem.id}`}
-                        className="font-semibold hover:underline"
+                        className="font-medium text-foreground hover:text-primary transition-colors"
                       >
                         {problem.title}
                       </Link>
-                    </td>
-                    <td>
+                    </TableCell>
+                    <TableCell>
                       <div className="flex flex-wrap gap-1">
                         {(problem.tags || []).map((tag, i) => (
-                          <span
+                          <Badge
                             key={i}
-                            className="badge badge-outline badge-warning text-xs font-bold"
+                            variant="tag"
+                            className="text-[11px] font-medium"
                           >
                             {tag}
-                          </span>
+                          </Badge>
                         ))}
                       </div>
-                    </td>
-                    <td>
-                      <span
-                        className={`badge font-semibold text-xs text-white ${problem.difficulty === "EASY"
-                            ? "badge-success"
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          problem.difficulty === "EASY"
+                            ? "easy"
                             : problem.difficulty === "MEDIUM"
-                              ? "badge-warning"
-                              : "badge-error"
-                          }`}
+                              ? "medium"
+                              : "hard"
+                        }
                       >
                         {problem.difficulty}
-                      </span>
-                    </td>
-                    <td>
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
                       <div className="flex flex-col md:flex-row gap-2 lg:items-center md:items-center">
                         {authUser?.role === "ADMIN" && (
                           <div className="flex gap-2">
                             <div className="tooltip" data-tip="Delete">
-                              <button
+                              <Button
+                                variant="destructive"
+                                size="sm"
                                 onClick={() => handleDelete(problem.id)}
                                 disabled={isDeletingProblem}
-                                className="btn btn-sm btn-error"
+                                className="h-8 w-8 p-0"
                               >
                                 {isDeletingProblem ? (
                                   <Loader2 className="animate-spin h-4 w-4" />
                                 ) : (
                                   <TrashIcon className="w-4 h-4 text-white" />
                                 )}
-                              </button>
+                              </Button>
                             </div>
                             <div className="tooltip" data-tip="Edit">
-                              <button className="tooltip-top btn btn-sm btn-warning" data-tip="Edit">
-                                <PencilIcon className="w-4 h-4 text-white" />
-                              </button>
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                className="h-8 w-8 p-0 bg-amber-500/15 text-amber-400 hover:bg-amber-500/25 border border-amber-500/30"
+                              >
+                                <PencilIcon className="w-4 h-4" />
+                              </Button>
                             </div>
                           </div>
                         )}
                         <div className="tooltip tooltip-top" data-tip="Add To Playlist">
-                          <button
-                            className="btn btn-circle btn-info btn-outline"
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 rounded-full text-sky-400 border-sky-400/40 hover:bg-sky-400/10"
                             onClick={() => handleAddToPlaylist(problem.id)}
                           >
                             <Bookmark className="w-4 h-4" />
-                          </button>
+                          </Button>
                         </div>
                       </div>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 );
               })
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
 
       {/* Pagination */}
-      <div className="flex justify-center items-center mt-6 gap-2" >
-
-        <MoveLeftIcon
-          className="btn btn-sm btn-ghost cursor-pointer "
+      <div className="flex justify-center items-center mt-6 gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
           disabled={currentPage === 1}
-          onClick={() => setCurrentPage((prev) => prev - 1)} />
-        <span className="btn btn-ghost btn-sm">
-          {currentPage}/{totalPages}
+          onClick={() => setCurrentPage((prev) => prev - 1)}
+        >
+          <MoveLeftIcon className="w-4 h-4" />
+        </Button>
+        <span className="text-xs font-semibold px-3 py-1.5 rounded-md bg-muted text-muted-foreground">
+          {currentPage} / {totalPages}
         </span>
-        <MoveRightIcon
-          className="btn btn-sm btn-ghost cursor-pointer "
+        <Button
+          variant="ghost"
+          size="sm"
           disabled={currentPage === totalPages}
           onClick={() => setCurrentPage((prev) => prev + 1)}
-        />
+        >
+          <MoveRightIcon className="w-4 h-4" />
+        </Button>
       </div>
 
       {/* Modal */}

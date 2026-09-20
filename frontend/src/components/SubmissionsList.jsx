@@ -3,9 +3,12 @@ import {
   ChevronDown,
   ChevronUp,
   RotateCw,
+  Loader2,
 } from "lucide-react";
 import { usesubmissionStore } from "../store/useSubmissionStore";
 import { useParams } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 const SubmissionsList = memo(({ submissions, isSubmissionLoading }) => {
   const { id: problemId } = useParams();
@@ -89,8 +92,8 @@ const SubmissionsList = memo(({ submissions, isSubmissionLoading }) => {
   // Loading state
   if (isSubmissionLoading) {
     return (
-      <div className="flex justify-center items-center p-8">
-        <span className="loading loading-spinner loading-lg text-primary"></span>
+      <div className="flex justify-center items-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -100,13 +103,15 @@ const SubmissionsList = memo(({ submissions, isSubmissionLoading }) => {
     return (
       <div className="text-center p-8 select-none">
         <div className="text-neutral-500 text-sm mb-2">No submissions yet</div>
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={handleRefresh}
-          className="btn btn-ghost btn-xs text-neutral-400 hover:text-white gap-1"
+          className="h-7 text-xs text-neutral-400 hover:text-white gap-1"
         >
           <RotateCw className="w-3 h-3" />
           Refresh
-        </button>
+        </Button>
       </div>
     );
   }
@@ -146,12 +151,10 @@ const SubmissionsList = memo(({ submissions, isSubmissionLoading }) => {
                 onClick={() => setExpandedId(isExpanded ? null : submission.id)}
               >
                 {/* Left side: Status and formatted Date */}
-                <div className="flex flex-col gap-1.5">
-                  <span className={`text-sm font-bold tracking-wide ${
-                    isAccepted ? "text-[#2cbb5d]" : "text-[#ef4743]"
-                  }`}>
+                <div className="flex items-center gap-3">
+                  <Badge variant={isAccepted ? "easy" : "hard"} className="font-semibold text-xs px-2.5 py-0.5">
                     {statusText}
-                  </span>
+                  </Badge>
                   <span className="text-neutral-400 text-xs font-medium">
                     {getFormattedDate(submission.createdAt)}
                   </span>

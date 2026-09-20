@@ -1,5 +1,8 @@
 import React from "react";
-import { Terminal, Play, Plus, CheckCircle2, XCircle } from "lucide-react";
+import { Terminal, Play, Plus, CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 
 const ConsolePanel = ({
   consoleTab,
@@ -16,37 +19,29 @@ const ConsolePanel = ({
 }) => {
   return (
     <div className="w-full h-full flex flex-col overflow-hidden bg-[#1e1e1e]">
-      {/* Console Headers */}
-      <div className="flex items-center justify-between bg-[#282828] border-b border-[#3e3e3e] px-4 h-10 select-none flex-shrink-0">
-        <div className="flex items-center gap-1 h-full">
-          <button
-            className={`px-4 py-2 text-xs font-semibold flex items-center gap-1.5 cursor-pointer h-full border-b-2 ${
-              consoleTab === "testcase"
-                ? "text-white border-[#ffa116] bg-[#1e1e1e]"
-                : "text-neutral-400 hover:text-white border-transparent"
-            }`}
-            onClick={() => setConsoleTab("testcase")}
-          >
-            <Terminal className="w-3.5 h-3.5" />
-            Testcase
-          </button>
-          <button
-            className={`px-4 py-2 text-xs font-semibold flex items-center gap-1.5 cursor-pointer h-full border-b-2 ${
-              consoleTab === "result"
-                ? "text-white border-[#ffa116] bg-[#1e1e1e]"
-                : "text-neutral-400 hover:text-white border-transparent"
-            }`}
-            onClick={() => setConsoleTab("result")}
-          >
-            <Play className="w-3.5 h-3.5 text-emerald-500 fill-current" />
-            Test Result
-          </button>
+      <Tabs value={consoleTab} onValueChange={setConsoleTab} className="flex flex-col h-full">
+        {/* Console Headers */}
+        <div className="flex items-center justify-between bg-[#282828] border-b border-[#3e3e3e] px-4 h-10 select-none flex-shrink-0">
+          <TabsList className="flex items-center gap-1 h-full bg-transparent p-0 rounded-none">
+            <TabsTrigger
+              value="testcase"
+              className="px-4 py-2 text-xs font-semibold flex items-center gap-1.5 cursor-pointer h-full rounded-none border-b-2 data-[state=active]:text-white data-[state=active]:border-primary data-[state=active]:bg-[#1e1e1e] data-[state=active]:shadow-none text-neutral-400 hover:text-white border-transparent bg-transparent"
+            >
+              <Terminal className="w-3.5 h-3.5" />
+              Testcase
+            </TabsTrigger>
+            <TabsTrigger
+              value="result"
+              className="px-4 py-2 text-xs font-semibold flex items-center gap-1.5 cursor-pointer h-full rounded-none border-b-2 data-[state=active]:text-white data-[state=active]:border-primary data-[state=active]:bg-[#1e1e1e] data-[state=active]:shadow-none text-neutral-400 hover:text-white border-transparent bg-transparent"
+            >
+              <Play className="w-3.5 h-3.5 text-emerald-500 fill-current" />
+              Test Result
+            </TabsTrigger>
+          </TabsList>
         </div>
-      </div>
 
-      {/* Console Content */}
-      <div className="flex-1 overflow-y-auto p-5 bg-[#1e1e1e]">
-        {consoleTab === "testcase" ? (
+        {/* Console Content */}
+        <TabsContent value="testcase" className="flex-1 overflow-y-auto p-5 bg-[#1e1e1e] mt-0">
           <div className="space-y-4 h-full flex flex-col select-text">
             {/* Testcase Tabs */}
             <div className="flex flex-wrap gap-2 items-center mb-1 select-none">
@@ -77,8 +72,8 @@ const ConsolePanel = ({
               <div className="space-y-4 flex-1">
                 <div>
                   <div className="text-neutral-400 text-xs font-semibold mb-1.5 uppercase tracking-wider">Input</div>
-                  <textarea
-                    className="w-full bg-[#2a2a2a] text-white font-mono text-xs p-3.5 rounded-lg border border-neutral-800 focus:outline-none focus:border-neutral-700 select-text"
+                  <Textarea
+                    className="w-full bg-[#2a2a2a] text-white font-mono text-xs p-3.5 rounded-lg border-neutral-800 focus-visible:ring-neutral-700 select-text resize-none"
                     rows={3}
                     value={testCases[activeTestCaseIndex].input}
                     onChange={(e) => {
@@ -90,8 +85,8 @@ const ConsolePanel = ({
                 </div>
                 <div>
                   <div className="text-neutral-400 text-xs font-semibold mb-1.5 uppercase tracking-wider">Expected Output</div>
-                  <textarea
-                    className="w-full bg-[#2a2a2a] text-white font-mono text-xs p-3.5 rounded-lg border border-neutral-800 focus:outline-none focus:border-neutral-700 select-text"
+                  <Textarea
+                    className="w-full bg-[#2a2a2a] text-white font-mono text-xs p-3.5 rounded-lg border-neutral-800 focus-visible:ring-neutral-700 select-text resize-none"
                     rows={1}
                     value={testCases[activeTestCaseIndex].output}
                     onChange={(e) => {
@@ -106,12 +101,14 @@ const ConsolePanel = ({
               <div className="text-neutral-500 text-xs text-center py-6">No testcases. Click + to add one.</div>
             )}
           </div>
-        ) : (
-          /* Test Result Tab */
+        </TabsContent>
+
+        <TabsContent value="result" className="flex-1 overflow-y-auto p-5 bg-[#1e1e1e] mt-0">
+          {/* Test Result Tab */}
           <div className="h-full select-text">
             {isExecuting ? (
               <div className="flex flex-col items-center justify-center h-full text-neutral-400 gap-3 py-6">
-                <span className="loading loading-spinner loading-md text-[#ffa116]"></span>
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
                 <span className="text-xs font-semibold animate-pulse tracking-wide">Executing code against test cases...</span>
               </div>
             ) : submission ? (
@@ -223,8 +220,8 @@ const ConsolePanel = ({
               </div>
             )}
           </div>
-        )}
-      </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

@@ -1,12 +1,32 @@
-import { X } from "lucide-react";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { usePlaylistStore } from "../../store/usePlaylistStore";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
-const CreatePlaylistModal = ({ ModalRef, closeModal, onSubmit }) => {
-  const {isPlaylistLoading} = usePlaylistStore();
+const CreatePlaylistModal = ({ isOpen, onClose, ModalRef, closeModal, onSubmit }) => {
+  const { isPlaylistLoading } = usePlaylistStore();
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
   const [serverError, setServerError] = useState(null);
+
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isModalOpen = isOpen !== undefined ? isOpen : internalOpen;
+  const handleClose = onClose || closeModal || (() => setInternalOpen(false));
+
+  useEffect(() => {
+    if (ModalRef) {
+      ModalRef.current = {
+        showModal: () => setInternalOpen(true),
+        close: () => setInternalOpen(false),
+      };
+    }
+  }, [ModalRef]);
 
   const handleFormSubmit = async (data) => {
     setServerError("");
@@ -14,86 +34,59 @@ const CreatePlaylistModal = ({ ModalRef, closeModal, onSubmit }) => {
 
     if (result.success) {
       reset();
-      closeModal();
+      handleClose();
     } else {
       setServerError(result.message || "Failed to create playlist");
     }
   };
 
   return (
-    <dialog ref={ModalRef} className="modal">
-      <div className="modal-box w-full max-w-md p-6 space-y-6">
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <h3 className="text-xl font-semibold">Create New Playlist</h3>
-          <button
-            type="button"
-            onClick={closeModal}
-            className="btn btn-sm btn-circle btn-ghost"
-            aria-label="Close"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
+    <Dialog open={isModalOpen} onOpenChange={(open) => !open && handleClose()}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-semibold">Create New Playlist</DialogTitle>
+        </DialogHeader>
 
-        {/* Form */}
-        <form
-          onSubmit={handleSubmit(handleFormSubmit)}
-          className="space-y-5"
-        >
+        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4 pt-2">
           {/* Playlist Name */}
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text font-medium">Playlist Name</span>
-            </label>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-foreground">Playlist Name</label>
             <input
               type="text"
               placeholder="Enter playlist name"
-              className={`input input-bordered w-full ${errors.name ? "input-error" : ""}`}
+              className={`flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${
+                errors.name ? "border-destructive" : "border-input"
+              }`}
               {...register("name", { required: "Playlist name is required" })}
             />
             {(errors.name || serverError) && (
-              <label className="label">
-                <span className="label-text-alt text-error">
-                  {errors.name?.message || serverError}
-                </span>
-              </label>
+              <p className="text-xs text-destructive">
+                {errors.name?.message || serverError}
+              </p>
             )}
           </div>
 
           {/* Description */}
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text font-medium">Description</span>
-            </label>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-foreground">Description</label>
             <textarea
               placeholder="Enter playlist description (optional)"
-              className="textarea textarea-bordered h-24 resize-none w-full"
+              className="flex min-h-[96px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 resize-none"
               {...register("description")}
             />
           </div>
 
-          {/* Actions */}
-          <div className="flex justify-end gap-3 pt-4 border-t">
-            <button
-              type="button"
-              onClick={closeModal}
-              className="btn btn-ghost"
-            >
+          <DialogFooter className="pt-4">
+            <Button type="button" variant="ghost" onClick={handleClose}>
               Cancel
-            </button>
-            <button type="submit" className="btn btn-primary">
+            </Button>
+            <Button type="submit" disabled={isPlaylistLoading}>
               {isPlaylistLoading ? "Creating..." : "Create Playlist"}
-            </button>
-          </div>
+            </Button>
+          </DialogFooter>
         </form>
-      </div>
-
-      {/* Overlay close behavior */}
-      <form method="dialog" className="modal-backdrop">
-        <button aria-label="Close modal"></button>
-      </form>
-    </dialog>
+      </DialogContent>
+    </Dialog>
   );
 };
 

@@ -1,81 +1,87 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { X, Plus, Loader } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { Plus, Loader } from 'lucide-react'
 import { usePlaylistStore } from '../../store/usePlaylistStore'
 import { useAuthStore } from '../../store/useAuthStore'
 import CreatePlaylistModal from './CreatePlaylistModal'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 
-
-const AddToPlaylistModal = ({ ModalRef, closeModal, problemId }) => {
+const AddToPlaylistModal = ({ isOpen, onClose, ModalRef, closeModal, problemId }) => {
   const { playlists, getAllPlaylists, addProblemToPlaylist, isPlaylistLoading, createPlaylist } = usePlaylistStore()
   const { authUser } = useAuthStore()
 
-  const [selectedPlaylist, setSelectedPlaylist] = useState("");
-  const [serverError, setServerError] = useState(null);
+  const [selectedPlaylist, setSelectedPlaylist] = useState("")
+  const [serverError, setServerError] = useState(null)
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
 
-  //CreatePlaylistModal ref
-  const createPlaylistModalRef = useRef(null);
+  const [internalOpen, setInternalOpen] = useState(false)
+  const isModalOpen = isOpen !== undefined ? isOpen : internalOpen
+  const handleClose = onClose || closeModal || (() => setInternalOpen(false))
 
-  const openCreatePlaylistModal = () => {
-    if (createPlaylistModalRef.current) {
-      createPlaylistModalRef.current.showModal();
+  useEffect(() => {
+    if (ModalRef) {
+      ModalRef.current = {
+        showModal: () => setInternalOpen(true),
+        close: () => setInternalOpen(false),
+      }
     }
-  }
-
-  const closeCreatePlaylistModal = () => {
-    if (createPlaylistModalRef.current) {
-      createPlaylistModalRef.current.close();
-    }
-  }
+  }, [ModalRef])
 
   const handleCreatePlaylist = async (data) => {
     try {
-      const res = await createPlaylist(data);
-      await getAllPlaylists(); 
+      const res = await createPlaylist(data)
+      await getAllPlaylists()
 
       if (res?.id) {
-        setSelectedPlaylist(res.id); //select the newly created playlist
-      }else if(res?.data?.id){
-        setSelectedPlaylist(res.data.id); 
+        setSelectedPlaylist(res.id)
+      } else if (res?.data?.id) {
+        setSelectedPlaylist(res.data.id)
       }
       
-      return { success: true, data: res };
-
+      return { success: true, data: res }
     } catch (error) {
-      return { success: false , message: error.message};
+      return { success: false, message: error.message }
     }
   }
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-    setServerError("");
 
-    const result = await addProblemToPlaylist(selectedPlaylist, [problemId]);
+  const handleFormSubmit = async (e) => {
+    e.preventDefault()
+    setServerError("")
+
+    const result = await addProblemToPlaylist(selectedPlaylist, [problemId])
     if (result.success) {
-      closeModal();
+      handleClose()
     } else {
-      setServerError(result.message || "Failed to add problem to playlist");
+      setServerError(result.message || "Failed to add problem to playlist")
     }
   }
 
   useEffect(() => {
-    if (ModalRef && authUser) {
-      getAllPlaylists();
+    if (isModalOpen && authUser) {
+      getAllPlaylists()
     }
-  }, [ModalRef, getAllPlaylists, authUser])
-
+  }, [isModalOpen, getAllPlaylists, authUser])
 
   return (
     <>
-      <dialog ref={ModalRef} className="modal">
-        <div className="modal-box w-full max-w-md p-6 space-y-6">
-          <h3>Select a playlist to add this problem to:</h3>
-          <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" aria-label="Close">
-            <X className="w-4 h-4" onClick={closeModal} />
-          </button>
+      <Dialog open={isModalOpen} onOpenChange={(open) => !open && handleClose()}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-semibold">
+              Select a playlist to add this problem to:
+            </DialogTitle>
+          </DialogHeader>
 
-          <form onSubmit={handleFormSubmit} className="space-y-4">
+          <form onSubmit={handleFormSubmit} className="space-y-4 pt-2">
             <div>
               <select
-                className='select select-primary w-full'
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 value={selectedPlaylist}
                 onChange={(e) => setSelectedPlaylist(e.target.value)}
               >
@@ -86,39 +92,38 @@ const AddToPlaylistModal = ({ ModalRef, closeModal, problemId }) => {
                   </option>
                 ))}
               </select>
-              <p className="mt-2 text-sm">
-                {serverError && <span className="text-error">{serverError}</span>}
-              </p>
-
+              {serverError && (
+                <p className="mt-2 text-xs text-destructive">{serverError}</p>
+              )}
             </div>
-            <div className="flex justify-end gap-2 mt-6">
-              <button type="button" onClick={openCreatePlaylistModal} className="btn btn-outline btn-success">
-                <Plus className="w-4 h-4" /> Create Playlist
-              </button>
-              <button type="button" onClick={closeModal} className="btn btn-ghost">
+
+            <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsCreateOpen(true)}
+                className="text-emerald-500 border-emerald-500/40 hover:bg-emerald-500/10"
+              >
+                <Plus className="w-4 h-4 mr-1" /> Create Playlist
+              </Button>
+              <Button type="button" variant="ghost" onClick={handleClose}>
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
-                className="btn btn-primary"
                 disabled={!selectedPlaylist || isPlaylistLoading}
               >
                 {isPlaylistLoading ? <Loader className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                 Add to Playlist
-              </button>
-            </div>
+              </Button>
+            </DialogFooter>
           </form>
-
-        </div>
-
-        <form method="dialog" className="modal-backdrop">
-          <button aria-label="Close modal"></button>
-        </form>
-      </dialog>
+        </DialogContent>
+      </Dialog>
 
       <CreatePlaylistModal
-        ModalRef={createPlaylistModalRef}
-        closeModal={closeCreatePlaylistModal}
+        isOpen={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
         onSubmit={handleCreatePlaylist}
       />
     </>

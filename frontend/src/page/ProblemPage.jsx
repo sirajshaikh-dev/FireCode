@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { Code2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from "@/components/ui/dialog";
 
 import { useProblemStore } from "../store/useProblemStore";
 import { useExecutionStore } from "../store/useExecutionStore";
@@ -34,7 +42,7 @@ const ProblemPage = () => {
     const [activeTestCaseIndex, setActiveTestCaseIndex] = useState(0);
     const [activeResultCaseIndex, setActiveResultCaseIndex] = useState(0);
 
-    const { executeCode, submitCode, clearSubmission, submission, isExecuting } = useExecutionStore();
+    const { executeCode, submitCode, clearSubmission, submission, isExecuting, isRunning, isSubmitting } = useExecutionStore();
     const { authUser } = useAuthStore();
 
     const { 
@@ -222,6 +230,8 @@ const ProblemPage = () => {
                 handleRandomProblem={handleRandomProblem}
                 handleRunCode={handleRunCode}
                 handleSubmitCode={handleSubmitCode}
+                isRunning={isRunning}
+                isSubmitting={isSubmitting}
                 isExecuting={isExecuting}
                 isBookmarked={isBookmarked}
                 setIsBookmarked={setIsBookmarked}
@@ -313,47 +323,46 @@ const ProblemPage = () => {
             </main>
 
             {/* AUTH gate modal */}
-            {isAuthModalOpen && (
-                <div className="modal modal-open backdrop-blur-md bg-black/60 transition-all duration-300">
-                    <div className="modal-box border border-primary/20 bg-[#1e1e1e] text-white shadow-2xl rounded-2xl max-w-md relative overflow-hidden">
-                        <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#ffa116]/10 rounded-full blur-2xl"></div>
-                        <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-primary/10 rounded-full blur-2xl"></div>
-
-                        <button
-                            className="btn btn-sm btn-circle btn-ghost absolute right-4 top-4 text-neutral-400 hover:text-white"
-                            onClick={() => setIsAuthModalOpen(false)}
-                        >
-                            ✕
-                        </button>
-                        
-                        <div className="flex flex-col items-center text-center p-4">
-                            <div className="bg-[#ffa116]/10 p-4 rounded-full mb-4 animate-bounce">
-                                <Code2 className="w-12 h-12 text-[#ffa116]" />
-                            </div>
-                            <h3 className="text-2xl font-bold text-white mb-2">Join FireCode</h3>
-                            <p className="text-neutral-400 text-sm mb-6">
+            <Dialog open={isAuthModalOpen} onOpenChange={setIsAuthModalOpen}>
+                <DialogContent className="sm:max-w-md bg-card text-card-foreground border-primary/20">
+                    <div className="flex flex-col items-center text-center p-2">
+                        <div className="bg-primary/10 p-4 rounded-full mb-4 animate-bounce">
+                            <Code2 className="w-10 h-10 text-primary" />
+                        </div>
+                        <DialogHeader className="space-y-2 text-center">
+                            <DialogTitle className="text-2xl font-bold text-center">Join FireCode</DialogTitle>
+                            <DialogDescription className="text-muted-foreground text-sm text-center">
                                 Sign up or log in to submit your solution, verify all test cases, track your coding stats, and join the leaderboard!
-                            </p>
-                            <div className="flex flex-col sm:flex-row gap-3 w-full justify-center">
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="flex flex-col sm:flex-row gap-3 w-full justify-center mt-6">
+                            <Button
+                                asChild
+                                className="flex-1 shadow-lg shadow-primary/20"
+                            >
                                 <Link
                                     to="/login"
                                     state={{ from: `/problem/${id}` }}
-                                    className="btn btn-primary flex-1 shadow-lg shadow-primary/20"
                                 >
                                     Log In
                                 </Link>
+                            </Button>
+                            <Button
+                                variant="outline"
+                                asChild
+                                className="flex-1"
+                            >
                                 <Link
                                     to="/signup"
                                     state={{ from: `/problem/${id}` }}
-                                    className="btn btn-outline btn-secondary flex-1"
                                 >
                                     Sign Up
                                 </Link>
-                            </div>
+                            </Button>
                         </div>
                     </div>
-                </div>
-            )}
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };
