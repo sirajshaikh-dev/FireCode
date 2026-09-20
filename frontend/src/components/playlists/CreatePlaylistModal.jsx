@@ -54,8 +54,8 @@ const CreatePlaylistModal = ({ isOpen, onClose, ModalRef, closeModal, onSubmit }
             <input
               type="text"
               placeholder="Enter playlist name"
-              className={`flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${
-                errors.name ? "border-destructive focus-visible:ring-destructive" : "border-input"
+              className={`flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${
+                errors.name ? "border-destructive" : "border-input"
               }`}
               {...register("name", { required: "Playlist name is required" })}
             />
@@ -71,7 +71,7 @@ const CreatePlaylistModal = ({ isOpen, onClose, ModalRef, closeModal, onSubmit }
             <label className="text-sm font-medium text-foreground">Description</label>
             <textarea
               placeholder="Enter playlist description (optional)"
-              className="flex min-h-[96px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+              className="flex min-h-[96px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 resize-none"
               {...register("description")}
             />
           </div>

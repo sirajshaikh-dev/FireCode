@@ -1,7 +1,7 @@
 //ProblemTable.jsx
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Bookmark, PencilIcon, TrashIcon, Plus, OptionIcon, MoveLeftIcon, MoveRightIcon, Loader, Loader2 } from "lucide-react";
+import { Bookmark, PencilIcon, TrashIcon, Plus, OptionIcon, MoveLeftIcon, MoveRightIcon, Loader, Loader2, RotateCw } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuthStore } from "../store/useAuthStore";
 import { useProblemStore } from "../store/useProblemStore";
@@ -148,7 +148,7 @@ const ProblemTable = () => {
           <Input
             type="text"
             placeholder="Search By Title"
-            className="w-full bg-muted/40 focus-visible:ring-0 focus-visible:ring-offset-0"
+            className="w-full bg-muted/40"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -156,7 +156,7 @@ const ProblemTable = () => {
 
         <div className="flex flex-wrap items-center gap-4 w-full md:w-auto md:justify-end">
           <Select value={difficulty} onValueChange={(val) => setDifficulty(val)}>
-            <SelectTrigger className="w-40 bg-muted/40 focus:ring-0 focus:ring-offset-0">
+            <SelectTrigger className="w-40 bg-muted/40">
               <SelectValue placeholder="All Difficulties" />
             </SelectTrigger>
             <SelectContent side="bottom" className="max-h-64">
@@ -170,7 +170,7 @@ const ProblemTable = () => {
           </Select>
 
           <Select value={selectedTag} onValueChange={(val) => setSelectedTag(val)}>
-            <SelectTrigger className="w-48 bg-muted/40 focus:ring-0 focus:ring-offset-0">
+            <SelectTrigger className="w-48 bg-muted/40">
               <SelectValue placeholder="All Tags" />
             </SelectTrigger>
             <SelectContent side="bottom" className="max-h-64">
@@ -209,8 +209,14 @@ const ProblemTable = () => {
               </TableRow>
             ) : paginatedProblems.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                  No problems found.
+                <TableCell colSpan={5} className="text-center py-12 text-muted-foreground">
+                  <div className="flex flex-col items-center justify-center space-y-3">
+                    <p>No problems found.</p>
+                    <Button variant="outline" size="sm" onClick={() => getAllProblems()}>
+                      <RotateCw className="w-4 h-4 mr-2" />
+                      Try Again
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (
