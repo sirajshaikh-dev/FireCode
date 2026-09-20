@@ -97,13 +97,7 @@ const ProblemTable = () => {
       .filter((problem) => selectedTag === "ALL" ? true : problem.tags?.includes(selectedTag)) // Tag filter
   }, [problems, search, difficulty, selectedTag])
 
-  const itemsPerPage = 5;
-  const totalPages = Math.ceil(filteredProblems.length / itemsPerPage) // Eg: 50/5 = 10 Pages
-  const paginatedProblems = useMemo(() => {
-    return filteredProblems.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)  // ((1-1)*5, (1*5)) =>(0,5) | ((5-1)*5, (5*5)) =>(20,25)
-  }, [filteredProblems, currentPage])
 
-  // console.log("paginatedProblems", paginatedProblems);
 
   const handleDelete = async (id) => {
     deleteProblem(id)
@@ -207,7 +201,7 @@ const ProblemTable = () => {
                   <Loader className="size-8 animate-spin mx-auto text-primary" />
                 </TableCell>
               </TableRow>
-            ) : paginatedProblems.length === 0 ? (
+            ) : filteredProblems.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-center py-12 text-muted-foreground">
                   <div className="flex flex-col items-center justify-center space-y-3">
@@ -221,7 +215,7 @@ const ProblemTable = () => {
               </TableRow>
             ) : (
               // 🔹 Render problems when available
-              paginatedProblems.map((problem) => {
+              filteredProblems.map((problem) => {
                 const isSolved = problem.solvedBy?.some(
                   (user) => user.userId === authUser?.id
                 ) || false;
@@ -319,29 +313,6 @@ const ProblemTable = () => {
         </Table>
       </div>
 
-
-      {/* Pagination */}
-      <div className="flex justify-center items-center mt-6 gap-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          disabled={currentPage === 1}
-          onClick={() => setCurrentPage((prev) => prev - 1)}
-        >
-          <MoveLeftIcon className="w-4 h-4" />
-        </Button>
-        <span className="text-xs font-semibold px-3 py-1.5 rounded-md bg-muted text-muted-foreground">
-          {currentPage} / {totalPages}
-        </span>
-        <Button
-          variant="ghost"
-          size="sm"
-          disabled={currentPage === totalPages}
-          onClick={() => setCurrentPage((prev) => prev + 1)}
-        >
-          <MoveRightIcon className="w-4 h-4" />
-        </Button>
-      </div>
 
       {/* Modal */}
       {/* <CreatePlaylistModal
